@@ -3,6 +3,22 @@ include '../db_connect.php';
 
 function registerUser($username, $password, $email) {
     global $conn;
+
+    // Check if username or email already exists
+    $sql = "SELECT * FROM users WHERE username = ? OR email = ?";
+    $stmt = $conn->prepare($sql);
+    $stmt->bind_param("ss", $username, $email);
+    $stmt->execute();
+    $result = $stmt->get_result();
+
+    if ($result->num_rows > 0) {
+        echo "Feil: Brukernavn eller e-post eksisterer allerede";
+        $stmt->close();
+        return;
+    }
+
+    // If not, proceed with registration
+    $stmt->close();
     $hashed_password = password_hash($password, PASSWORD_DEFAULT);
     $role = 0; // Automatically set role to 'guest'
     $sql = "INSERT INTO users (username, password, email, role) VALUES (?, ?, ?, ?)";
@@ -20,6 +36,7 @@ function registerUser($username, $password, $email) {
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     registerUser($_POST['username'], $_POST['password'], $_POST['email']);
 }
+
 ?>
 
 <!DOCTYPE html>
