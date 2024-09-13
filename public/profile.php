@@ -1,5 +1,5 @@
 <?php
-include 'db_connect.php'; // Include your database connection file
+include '../db_connect.php'; // Include your database connection file
 
 function addLoyaltyPoints($user_id, $points) {
     global $conn;
