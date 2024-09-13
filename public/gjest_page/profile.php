@@ -1,5 +1,5 @@
 <?php
-include '../db_connect.php'; // Include your database connection file
+include '../../db_connect.php'; // Include your database connection file
 
 function addLoyaltyPoints($user_id, $points) {
     global $conn;
@@ -13,7 +13,7 @@ function addLoyaltyPoints($user_id, $points) {
 
 function getGuestProfile($user_id) {
     global $conn;
-    $sql = "SELECT * FROM users WHERE id = '$user_id'";
+    $sql = "SELECT * FROM users WHERE user_id = '$user_id'"; // Updated column name
     $result = $conn->query($sql);
     if ($result->num_rows > 0) {
         $row = $result->fetch_assoc();
