@@ -1,5 +1,6 @@
 <?php
 include '../db_connect.php';
+include '../Components/header.php';
 
 function registerUser($username, $password, $email) {
     global $conn;
@@ -49,12 +50,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
 </head>
 <body>
-    <div class="navbar">
-        <a href="index.php">Hjem</a>
-        <a href="register.php">Registrer Bruker</a>
-        <a href="login.php">Logg Inn</a>
-        <a href="profile.php">Profil</a>
-    </div>
     <div class="container">
         <h1>Registrer Bruker</h1>
         <form method="post" action="register.php">

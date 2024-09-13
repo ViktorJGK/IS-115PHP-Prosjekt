@@ -1,5 +1,6 @@
 <?php
 include '../db_connect.php'; // Include your database connection file
+include '../Components/header.php';
 
 function loginUser($username, $password) {
     global $conn;
@@ -40,12 +41,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     </style>
 </head>
 <body>
-    <div class="navbar">
-        <a href="index.php">Hjem</a>
-        <a href="register.php">Registrer Bruker</a>
-        <a href="login.php">Logg Inn</a>
-        <a href="profile.php">Profil</a>
-    </div>
     <div class="container">
         <h1>Logg Inn</h1>
         <form method="post" action="login.php">
