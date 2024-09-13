@@ -1,0 +1,35 @@
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f4f4f4;
+    margin: 0;
+    padding: 0;
+}
+.container {
+    width: 80%;
+    margin: auto;
+    overflow: hidden;
+}
+.navbar {
+    background: #333;
+    color: #fff;
+    padding: 10px 0;
+    text-align: center;
+}
+.navbar a {
+    color: #fff;
+    padding: 14px 20px;
+    text-decoration: none;
+    text-transform: uppercase;
+}
+.profile {
+    background: #fff;
+    padding: 20px;
+    margin-top: 20px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+.profile h2 {
+    margin-top: 0;
+}
+.profile p {
+    line-height: 1.6;
+}

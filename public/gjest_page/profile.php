@@ -1,5 +1,6 @@
 <?php
 include '../../db_connect.php'; // Include your database connection file
+include '../../Components/header.php'; // Include the header
 
 function addLoyaltyPoints($user_id, $points) {
     global $conn;
@@ -16,18 +17,26 @@ function getGuestProfile($user_id) {
     $sql = "SELECT * FROM users WHERE user_id = '$user_id'"; // Updated column name
     $result = $conn->query($sql);
     if ($result->num_rows > 0) {
-        $row = $result->fetch_assoc();
-        echo "Username: " . $row["username"] . "<br>";
-        // Fetch and display other profile details like reservation history, preferences, etc.
+        return $result->fetch_assoc();
     } else {
-        echo "No user found";
+        return null;
     }
 }
 
-session_start();
+$userProfile = null;
 if (isset($_SESSION['user_id'])) {
-    getGuestProfile($_SESSION['user_id']);
-} else {
-    echo "Please log in to view your profile.";
+    $userProfile = getGuestProfile($_SESSION['user_id']);
 }
 ?>
+
+<div class="container">
+    <div class="profile">
+        <?php if ($userProfile): ?>
+            <h2>Velkommen, <?php echo htmlspecialchars($userProfile['username']); ?>!</h2>
+            <p>Email: <?php echo htmlspecialchars($userProfile['email']); ?></p>
+            <!-- Add more profile details here -->
+        <?php else: ?>
+            <p>Vennligst <a href="login.php">logg inn</a> for å se din profil.</p>
+        <?php endif; ?>
+    </div>
+</div>
