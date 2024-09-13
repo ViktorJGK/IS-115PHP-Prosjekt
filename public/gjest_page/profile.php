@@ -2,15 +2,6 @@
 include '../../db_connect.php'; // Include your database connection file
 include '../../Components/header.php'; // Include the header
 
-function addLoyaltyPoints($user_id, $points) {
-    global $conn;
-    $sql = "UPDATE loyalty_program SET points = points + $points WHERE user_id = '$user_id'";
-    if ($conn->query($sql) === TRUE) {
-        echo "Points added successfully";
-    } else {
-        echo "Error: " . $sql . "<br>" . $conn->error;
-    }
-}
 
 function getGuestProfile($user_id) {
     global $conn;

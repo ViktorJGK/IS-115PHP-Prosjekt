@@ -12,7 +12,7 @@ function loginUser($username, $password) {
             $_SESSION['user_id'] = $row['user_id'];
             $_SESSION['username'] = $row['username'];
             $_SESSION['role'] = $row['role'];
-            header("Location: gjest_page/velkommen.php"); // Redirect to the desired page
+            header("Location: gjest_page/profile.php"); // Redirect to the desired page
             exit(); // Ensure no further code is executed
         } else {
             echo "Invalid password";
