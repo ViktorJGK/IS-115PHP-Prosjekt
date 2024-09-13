@@ -1,6 +1,6 @@
 <?php
-include '../../db_connect.php'; // Include your database connection file
-include '../../Components/header.php'; // Include the header
+include '../db_connect.php'; // Include your database connection file
+include '../Components/header.php'; // Include the header
 
 
 function getGuestProfile($user_id) {

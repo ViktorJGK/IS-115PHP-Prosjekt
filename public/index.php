@@ -1,3 +1,7 @@
+<?php
+    include "../Components/header.php"
+?>
+
 <!DOCTYPE html>
 <html>
 <head>
@@ -5,12 +9,6 @@
     <title>Rombooking System</title>
 </head>
 <body>
-    <div class="navbar">
-        <a href="index.php">Hjem</a>
-        <a href="register.php">Registrer Bruker</a>
-        <a href="login.php">Logg Inn</a>
-        <a href="profile.php">Profil</a>
-    </div>
     <div class="container">
         <h1>Velkommen til vårt motell</h1>
         <h2>Søk etter tilgjengelige rom</h2>
