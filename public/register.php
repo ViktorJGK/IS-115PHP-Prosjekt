@@ -1,9 +1,24 @@
 <?php
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
+error_reporting(E_ALL);
+
 include '../db_connect.php';
+if (!$conn) {
+    die("Database connection failed: " . $conn->connect_error);
+}
+
 include '../Components/header.php';
 
-function registerUser($username, $password, $email) {
+// Ensure only an authorized user can register as an admin
+function registerUser($username, $password, $email, $role) {
     global $conn;
+
+    // Restrict direct admin role assignment to authorized users
+    if ($role == 1 && (!isset($_SESSION['admin']) || !$_SESSION['admin'])) {
+        echo "Du har ikke tillatelse til å registrere deg som administrator.";
+        return;
+    }
 
     // Check if username or email already exists
     $sql = "SELECT * FROM users WHERE username = ? OR email = ?";
@@ -18,10 +33,9 @@ function registerUser($username, $password, $email) {
         return;
     }
 
-    // If not, proceed with registration
+    // Proceed with registration
     $stmt->close();
     $hashed_password = password_hash($password, PASSWORD_DEFAULT);
-    $role = 0; // Automatically set role to 'guest'
     $sql = "INSERT INTO users (username, password, email, role) VALUES (?, ?, ?, ?)";
     $stmt = $conn->prepare($sql);
     $stmt->bind_param("sssi", $username, $hashed_password, $email, $role);
@@ -34,11 +48,22 @@ function registerUser($username, $password, $email) {
     $stmt->close();
 }
 
+// Handle form submission
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-    registerUser($_POST['username'], $_POST['password'], $_POST['email']);
-}
+    $username = $_POST['username'];
+    $password = $_POST['password'];
+    $email = $_POST['email'];
+    $role = $_POST['role'];
 
+    // Validate role input
+    if (!in_array($role, [0, 1])) {
+        die("Ugyldig rolle valgt.");
+    }
+
+    registerUser($username, $password, $email, $role);
+}
 ?>
+
 
 <!DOCTYPE html>
 <html lang="en">
@@ -47,7 +72,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="../css/register.css">
     <title>Registrer Bruker</title>
-
 </head>
 <body>
     <div class="container">
@@ -59,8 +83,14 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             <label for="password">Passord:</label>
             <input type="password" id="password" name="password" required>
 
-            <label for="email">Email:</label>
+            <label for="email">E-post:</label>
             <input type="email" id="email" name="email" required>
+
+            <label for="role">Rolle:</label>
+            <select id="role" name="role">
+                <option value="0">Gjest</option>
+                <option value="1">Administrator</option>
+            </select>
 
             <input type="submit" value="Registrer">
         </form>
