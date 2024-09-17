@@ -14,6 +14,13 @@ session_start();
         <a href="login.php">Logg Inn</a>
         <a href="profile.php">Profil</a>
         <?php if (isset($_SESSION['user_id'])): ?>
-            <a href="login.php">Logg Ut</a>
+            <a href="#" id="logout" onclick="logoutUser()">Logg Ut</a>
         <?php endif; ?>
     </div>
+
+    <script>
+        function logoutUser() {
+            window.location.href = '../logout.php';
+        }
+    </script>
+</body>
