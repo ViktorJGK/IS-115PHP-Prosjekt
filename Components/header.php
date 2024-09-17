@@ -14,13 +14,10 @@ session_start();
         <a href="login.php">Logg Inn</a>
         <a href="profile.php">Profil</a>
         <?php if (isset($_SESSION['user_id'])): ?>
-            <a href="#" id="logout" onclick="logoutUser()">Logg Ut</a>
+            <form id="logout-form" action="../logout.php" method="POST" style="display:inline;">
+                <button type="submit" id="logout">Logg Ut</button>
+            </form>
         <?php endif; ?>
     </div>
-
-    <script>
-        function logoutUser() {
-            window.location.href = '../logout.php';
-        }
-    </script>
 </body>
+</html>
