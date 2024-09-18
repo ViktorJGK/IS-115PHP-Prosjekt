@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: 10. Sep, 2024 12:12 PM
+-- Generation Time: 18. Sep, 2024 12:17 PM
 -- Tjener-versjon: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -65,6 +65,15 @@ CREATE TABLE `room_types` (
   `max_children` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
+--
+-- Dataark for tabell `room_types`
+--
+
+INSERT INTO `room_types` (`room_type_id`, `type_name`, `description`, `max_adults`, `max_children`) VALUES
+(1, 'Enkeltrom', 'Et komfortabelt enkeltrom med alle nødvendige fasiliteter.', 1, 0),
+(2, 'Dobbeltrom', 'Et rom med plass til to voksne og ett barn.', 2, 1),
+(3, 'Junior Suite', 'En romslig suite med plass til to voksne og to barn.', 2, 2);
+
 -- --------------------------------------------------------
 
 --
@@ -79,6 +88,14 @@ CREATE TABLE `users` (
   `role` tinyint(1) NOT NULL COMMENT 'boolean 0 = gjest, 1 = admin',
   `created_at` timestamp NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dataark for tabell `users`
+--
+
+INSERT INTO `users` (`user_id`, `username`, `password`, `email`, `role`, `created_at`) VALUES
+(9, 'Viktor_0', '$2y$10$7ufUc9qClqNbb0Q7gXwkLuZBjzkkF7U692PNYBtEiAnhiG/1W8gmi', 'viktorkallhovd02@gmail.com', 0, '2024-09-13 11:30:02'),
+(11, 'Viktor_1', '$2y$10$jX0J2v7W4HdHBvsILwLfo.aXsRS1ujM8jAQgmPhRgkTSr.K5/gxN6', 'viktor@gmail.com', 1, '2024-09-13 12:34:09');
 
 --
 -- Indexes for dumped tables
@@ -97,7 +114,8 @@ ALTER TABLE `bookings`
 --
 ALTER TABLE `rooms`
   ADD PRIMARY KEY (`room_id`),
-  ADD UNIQUE KEY `room_number` (`room_number`);
+  ADD UNIQUE KEY `room_number` (`room_number`),
+  ADD KEY `fk_room_type` (`room_type_id`);
 
 --
 -- Indexes for table `room_types`
@@ -132,13 +150,13 @@ ALTER TABLE `rooms`
 -- AUTO_INCREMENT for table `room_types`
 --
 ALTER TABLE `room_types`
-  MODIFY `room_type_id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `room_type_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 
 --
 -- AUTO_INCREMENT for table `users`
 --
 ALTER TABLE `users`
-  MODIFY `user_id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `user_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=12;
 
 --
 -- Begrensninger for dumpede tabeller
@@ -156,7 +174,6 @@ ALTER TABLE `bookings`
 --
 ALTER TABLE `rooms`
   ADD CONSTRAINT `fk_room_type` FOREIGN KEY (`room_type_id`) REFERENCES `room_types` (`room_type_id`);
-
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
