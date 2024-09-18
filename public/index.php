@@ -6,7 +6,7 @@ ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
 
     include "../Components/header.php";
-    //include '../db_connect.php';
+    include '../db_connect.php';
   
 ?>
 
@@ -35,6 +35,10 @@ error_reporting(E_ALL);
             
             <input type="submit" value="Søk">
         </form>
+        <br>
+        <br>
+
+        <?php include "../tables.php"; ?>
     </div>
 </body>
 </html>
