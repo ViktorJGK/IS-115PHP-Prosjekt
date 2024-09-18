@@ -15,7 +15,7 @@ session_start();
         <a href="profile.php">Profil</a>
         <?php if (isset($_SESSION['user_id'])): ?>
             <form id="logout-form" action="../logout.php" method="POST" style="display:inline;">
-                <button type="submit" id="logout">Logg Ut</button>
+                <a href="../logout.php" type="submit" id="logout">Logg Ut</button> </a>
             </form>
         <?php endif; ?>
     </div>
