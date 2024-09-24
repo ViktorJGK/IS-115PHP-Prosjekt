@@ -19,5 +19,6 @@ session_start();
             </form>
         <?php endif; ?>
     </div>
+    <br>
 </body>
 </html>

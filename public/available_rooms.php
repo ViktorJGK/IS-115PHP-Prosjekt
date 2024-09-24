@@ -1,4 +1,8 @@
 <?php
+
+include "../db_connect.php";
+include "../Components/header.php";
+
 function getAvailableRooms($check_in, $check_out, $adults, $children) {
     global $conn;
     $sql = "SELECT * FROM rooms WHERE id NOT IN (SELECT room_id FROM reservations WHERE check_in <= '$check_out' AND check_out >= '$check_in') AND type_id IN (SELECT id FROM room_types WHERE max_adults >= '$adults' AND max_children >= '$children')";
