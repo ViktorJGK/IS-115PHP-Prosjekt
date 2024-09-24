@@ -18,7 +18,7 @@ if (isset($_SESSION['user_id'])) {
     $userProfile = getUserProfile($_SESSION['user_id']);
 }
 
-$isAdmin = $userProfile && $userProfile['role'] == 1; // Assuming 'role' column indicates admin (1) or guest (0)
+$isAdmin = $userProfile && $userProfile['role'] == 1; // 'role' column indicates admin (1) or guest (0)
 ?>
 
 <div class="container">
