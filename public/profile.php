@@ -25,18 +25,13 @@ $isAdmin = $userProfile && $userProfile['role'] == 1; // Assuming 'role' column 
     <div class="profile">
         <?php if ($userProfile): ?>
             <?php if ($isAdmin): ?>
-                <h2>Admin Dashboard</h2>
-                <p>Velkommen, <?php echo htmlspecialchars($userProfile['username']); ?>!</p>
-                <p>Email: <?php echo htmlspecialchars($userProfile['email']); ?></p>
-                <!-- Add more admin-specific details here -->
+                <?php include 'profiles/admin_dashboard.php'; ?>
             <?php else: ?>
-                <h2>Guest Profile</h2>
-                <p>Velkommen, <?php echo htmlspecialchars($userProfile['username']); ?>!</p>
-                <p>Email: <?php echo htmlspecialchars($userProfile['email']); ?></p>
-                <!-- Add more guest-specific details here -->
+                <?php include 'profiles/guest_profile.php'; ?>
             <?php endif; ?>
         <?php else: ?>
             <p>Please <a href="login.php">log in</a> to view your profile.</p>
         <?php endif; ?>
     </div>
 </div>
+
