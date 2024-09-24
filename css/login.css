@@ -33,8 +33,7 @@ label {
 
 input[type="text"],
 input[type="password"],
-input[type="email"],
-select {
+input[type="submit"] {
     padding: 10px;
     margin-bottom: 20px;
     border: 1px solid #ddd;
@@ -44,7 +43,6 @@ select {
 }
 
 input[type="submit"] {
-    padding: 10px;
     background-color: #5cb85c;
     color: white;
     border: none;

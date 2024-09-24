@@ -82,7 +82,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             
             <label for="password">Passord:</label>
             <input type="password" id="password" name="password" required>
-
+            
             <label for="email">E-post:</label>
             <input type="email" id="email" name="email" required>
 
