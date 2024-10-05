@@ -1,0 +1,41 @@
+<div class="container">
+  <div class="profile">
+      <?php if ($userProfile): ?>
+          <h2>Velkommen, <?php echo htmlspecialchars($userProfile['username']); ?>!</h2>
+          <p>Email: <?php echo htmlspecialchars($userProfile['email']); ?></p>
+          
+          <!-- Vis brukerens aktive bookinger -->
+          <?php if ($bookings): ?>
+              <h3>Dine aktive bookinger</h3>
+              <ul>
+              <?php foreach ($bookings as $booking): ?>
+                  <li>
+                      Romtype: <?php echo htmlspecialchars($booking['room_type']); ?> <br>
+                      Innsjekk: <?php echo htmlspecialchars($booking['check_in']); ?> <br>
+                      Utsjekk: <?php echo htmlspecialchars($booking['check_out']); ?> <br>
+                      <a href="cancel_booking.php?booking_id=<?php echo $booking['id']; ?>">Kanseller</a>
+                  </li>
+              <?php endforeach; ?>
+              </ul>
+          <?php else: ?>
+              <p>Du har ingen aktive bookinger.</p>
+          <?php endif; ?>
+          
+          <!-- Profil redigering -->
+          <a href="edit_profile.php">Endre profilinformasjon</a>
+          
+          <!-- Administratorpanel, hvis brukeren er admin -->
+          <?php if ($userProfile['role'] == 1): ?>
+              <h3>Administratorpanel</h3>
+              <ul>
+                  <li><a href="manage_rooms.php">Administrer rom</a></li>
+                  <li><a href="view_bookings.php">Vis alle bookinger</a></li>
+                  <li><a href="manage_users.php">Administrer brukere</a></li>
+              </ul>
+          <?php endif; ?>
+          
+      <?php else: ?>
+          <p>Vennligst <a href="login.php">logg inn</a> for å se din profil.</p>
+      <?php endif; ?>
+  </div>
+</div>

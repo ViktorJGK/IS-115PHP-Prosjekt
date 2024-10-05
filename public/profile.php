@@ -1,7 +1,7 @@
 <?php
 include '../db_connect.php'; // Include your database connection file
 include '../Components/header.php'; // Include the header
-
+include '../profile.html';
 function getUserProfile($user_id) {
     global $conn;
     $sql = "SELECT * FROM users WHERE user_id = '$user_id'";

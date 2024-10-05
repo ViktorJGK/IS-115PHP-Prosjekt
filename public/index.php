@@ -7,6 +7,7 @@ error_reporting(E_ALL);
 
     include "../Components/header.php";
     include '../db_connect.php';
+
   
 ?>
 
@@ -14,6 +15,8 @@ error_reporting(E_ALL);
 <html>
 <head>
     <link rel="stylesheet" href="../css/index.css">
+    <link rel="stylesheet" href="../css/footer.css"> <!-- Legg til footer-styling -->
+
     <title>Rombooking System</title>
 </head>
 <body>
@@ -40,5 +43,7 @@ error_reporting(E_ALL);
 
         <?php include "../tables.php"; ?>
     </div>
+    <?php include '../Components/footer.php'; ?> <!-- Inkluder footeren etter innholdet -->
+
 </body>
 </html>
