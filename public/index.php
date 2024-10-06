@@ -1,49 +1,49 @@
 <?php
-
-//For error handlinger direkte i nettleser
+// For error handling direkte i nettleser
 ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
 
-    include "../Components/header.php";
-    include '../db_connect.php';
+session_start(); // Husk å starte session for innloggede brukere
 
-  
+include "../Components/header.php";
+include '../db_connect.php';
 ?>
 
 <!DOCTYPE html>
-<html>
+<html lang="no">
 <head>
+    <meta charset="UTF-8">
+    <title>Rombooking System</title>
     <link rel="stylesheet" href="../css/index.css">
     <link rel="stylesheet" href="../css/footer.css"> <!-- Legg til footer-styling -->
-
-    <title>Rombooking System</title>
 </head>
 <body>
     <div class="container">
         <h1>Velkommen til vårt motell</h1>
         <h2>Søk etter tilgjengelige rom</h2>
-        <form method="post" action="available_rooms.php">
-            <label for="check_in">Innsjekkingsdato:</label>
-            <input type="date" id="check_in" name="check_in" required><br><br>
-            
-            <label for="check_out">Utsjekkingsdato:</label>
-            <input type="date" id="check_out" name="check_out" required><br><br>
-            
-            <label for="adults">Antall voksne:</label>
-            <input type="number" id="adults" name="adults" min="1" required><br><br>
-            
-            <label for="children">Antall barn:</label>
-            <input type="number" id="children" name="children" min="0" required><br><br>
-            
-            <input type="submit" value="Søk">
-        </form>
-        <br>
-        <br>
+        <form action="available_rooms.php" method="POST">
+    <label for="check_in">Innsjekkingsdato:</label>
+    <input type="date" name="check_in" id="check_in" required>
 
-        <?php include "../tables.php"; ?>
+    <label for="check_out">Utsjekkingsdato:</label>
+    <input type="date" name="check_out" id="check_out" required>
+
+    <label for="adults">Antall voksne:</label>
+    <input type="number" name="adults" id="adults" required min="1">
+
+    <label for="children">Antall barn:</label>
+    <input type="number" name="children" id="children" required min="0">
+
+    <input type="submit" value="Sjekk tilgjengelighet">
+</form>
+
+
+        <br><br>
+
+        <!-- Du kan inkludere mer dynamisk innhold her hvis ønskelig -->
     </div>
-    <?php include '../Components/footer.php'; ?> <!-- Inkluder footeren etter innholdet -->
 
+    <?php include '../Components/footer.php'; ?> <!-- Inkluder footeren etter innholdet -->
 </body>
 </html>
