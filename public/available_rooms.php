@@ -2,12 +2,11 @@
 include "../db_connect.php";
 include "../Components/header.php";
 
-session_start();
 ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
 
-var_dump($_POST);
+($_POST);
 
 if (isset($_POST['check_in'], $_POST['check_out'], $_POST['adults'], $_POST['children'])) {
     $check_in = $_POST['check_in'];
@@ -18,10 +17,8 @@ if (isset($_POST['check_in'], $_POST['check_out'], $_POST['adults'], $_POST['chi
     echo "Innsjekkingsdato: " . $check_in . "<br>";
     echo "Utsjekkingsdato: " . $check_out . "<br>";
 
-    var_dump($check_in);
-    var_dump($check_out);
-    var_dump($adults);
-    var_dump($children);
+    echo"Voksne" . $adults . "<br>" ;
+    echo"barn" . $children . "<br>";
 
     $sql = "SELECT r.room_number, rt.type_name, rt.max_adults, rt.max_children 
             FROM rooms r
@@ -61,7 +58,7 @@ if (isset($_POST['check_in'], $_POST['check_out'], $_POST['adults'], $_POST['chi
     $stmt->close();
 } else {
     echo "<p>Ugyldig forespørsel.</p>";
-}
+};
 
 $conn->close();
 ?>

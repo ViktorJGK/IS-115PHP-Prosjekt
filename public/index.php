@@ -4,8 +4,6 @@ ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
 
-session_start(); // Husk å starte session for innloggede brukere
-
 include "../Components/header.php";
 include '../db_connect.php';
 ?>
@@ -43,6 +41,7 @@ include '../db_connect.php';
 
         <!-- Du kan inkludere mer dynamisk innhold her hvis ønskelig -->
     </div>
+    <?php include '../tables.php'; ?>
 
     <?php include '../Components/footer.php'; ?> <!-- Inkluder footeren etter innholdet -->
 </body>
