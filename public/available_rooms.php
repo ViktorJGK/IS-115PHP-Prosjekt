@@ -9,16 +9,23 @@ error_reporting(E_ALL);
 ($_POST);
 
 if (isset($_POST['check_in'], $_POST['check_out'], $_POST['adults'], $_POST['children'])) {
+
+    // Henter verdier fra POST-requesten og konverterer til passende datatyper
     $check_in = $_POST['check_in'];
     $check_out = $_POST['check_out'];
     $adults = isset($_POST['adults']) ? intval($_POST['adults']) : null;
     $children = isset($_POST['children']) ? intval($_POST['children']) : null;
 
+    // Viser innsjekkingsdato, utsjekkingsdato, antall voksne og barn
     echo "Innsjekkingsdato: " . $check_in . "<br>";
     echo "Utsjekkingsdato: " . $check_out . "<br>";
+    echo "Voksne" . $adults . "<br>";
+    echo "barn" . $children . "<br>";
 
-    echo"Voksne" . $adults . "<br>" ;
-    echo"barn" . $children . "<br>";
+
+    // SQL-spørring for å finne tilgjengelige rom
+    // Finner rom som ikke er booket i den angitte perioden
+    // og som har plass til det angitte antall voksne og barn
 
     $sql = "SELECT r.room_number, rt.type_name, rt.max_adults, rt.max_children 
             FROM rooms r
@@ -37,7 +44,9 @@ if (isset($_POST['check_in'], $_POST['check_out'], $_POST['adults'], $_POST['chi
 
     $result = $stmt->get_result();
 
+    // Sjekker om det finnes tilgjengelige rom
     if ($result->num_rows > 0) {
+        // Viser en tabell over tilgjengelige rom
         echo "<h2>Tilgjengelige rom:</h2>";
         echo "<table>";
         echo "<tr><th>Romnummer</th><th>Type</th><th>Maks voksne</th><th>Maks barn</th></tr>";
@@ -61,4 +70,3 @@ if (isset($_POST['check_in'], $_POST['check_out'], $_POST['adults'], $_POST['chi
 };
 
 $conn->close();
-?>

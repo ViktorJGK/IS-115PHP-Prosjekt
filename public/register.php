@@ -14,6 +14,7 @@ include '../Components/header.php';
 function registerUser($username, $password, $email, $role) {
     global $conn;
 
+    //skal fjernes i sammhold med html
     // Restrict direct admin role assignment to authorized users
     if ($role == 1 && (!isset($_SESSION['admin']) || !$_SESSION['admin'])) {
         echo "Du har ikke tillatelse til å registrere deg som administrator.";
