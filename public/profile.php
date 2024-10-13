@@ -1,11 +1,12 @@
 <?php
-include '../db_connect.php'; // Include your database connection file
-include '../Components/header.php'; // Include the header
+include '../db_connect.php'; // inkluderer databse koblinmg fil
+include '../Components/header.php'; // inkluderer header
 
-function getUserProfile($user_id) {
+function getUserProfile($user_id)
+{
     global $conn;
-    $sql = "SELECT * FROM users WHERE user_id = '$user_id'";
-    $result = $conn->query($sql);
+    $sql = "SELECT * FROM users WHERE user_id = '$user_id'"; //sql spørring for å hente brukerdata
+    $result = $conn->query($sql); //utfører spøring
     if ($result->num_rows > 0) {
         return $result->fetch_assoc();
     } else {
@@ -13,9 +14,10 @@ function getUserProfile($user_id) {
     }
 }
 
+//Initialiserer variabelen $userProfile med null
 $userProfile = null;
-if (isset($_SESSION['user_id'])) {
-    $userProfile = getUserProfile($_SESSION['user_id']);
+if (isset($_SESSION['user_id'])) { //sjekker om bruker er innlogget
+    $userProfile = getUserProfile($_SESSION['user_id']); // Henter brukerprofilen ved hjelp av bruker-ID fra sesjonen
 }
 
 $isAdmin = $userProfile && $userProfile['role'] == 1; // 'role' column indicates admin (1) or guest (0)
@@ -23,6 +25,7 @@ $isAdmin = $userProfile && $userProfile['role'] == 1; // 'role' column indicates
 
 <div class="container">
     <div class="profile">
+        <!-- Logikk for hvilken profil du skal se -->
         <?php if ($userProfile): ?>
             <?php if ($isAdmin): ?>
                 <?php include 'profiles/admin_dashboard.php'; ?>
@@ -34,4 +37,3 @@ $isAdmin = $userProfile && $userProfile['role'] == 1; // 'role' column indicates
         <?php endif; ?>
     </div>
 </div>
-
