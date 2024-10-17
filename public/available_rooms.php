@@ -49,7 +49,7 @@ if (isset($_POST['check_in'], $_POST['check_out'], $_POST['adults'], $_POST['chi
         // Viser en tabell over tilgjengelige rom
         echo "<h2>Tilgjengelige rom:</h2>";
         echo "<table>";
-        echo "<tr><th>Romnummer</th><th>Type</th><th>Maks voksne</th><th>Maks barn</th></tr>";
+        echo "<tr><th>Romnummer</th><th>Type</th><th>Maks voksne</th><th>Maks barn</th><th>Pris</th></tr>";
 
         while ($row = $result->fetch_assoc()) {
             echo "<tr>";
@@ -57,16 +57,49 @@ if (isset($_POST['check_in'], $_POST['check_out'], $_POST['adults'], $_POST['chi
             echo "<td>" . htmlspecialchars($row['type_name'] ?? 'Ikke tilgjengelig') . "</td>";
             echo "<td>" . htmlspecialchars($row['max_adults']) . "</td>";
             echo "<td>" . htmlspecialchars($row['max_children']) . "</td>";
-            echo "</tr>";
+            echo "<td>" . (isset($row['price']) ? htmlspecialchars($row['price']) . " NOK" : 'Pris ikke tilgjengelig') . "</td>";            echo "</tr>";
         }
         echo "</table>";
     } else {
         echo "<p>Ingen rom tilgjengelig for den angitte perioden.</p>";
-    }
+    }    
 
     $stmt->close();
 } else {
     echo "<p>Ugyldig forespørsel.</p>";
 };
 
+//spørring for vise om noen rom er opptatte
+
+$sql_occupied = "SELECT r.room_number, rt.type_name 
+                 FROM rooms r
+                 JOIN room_types rt ON r.room_type_id = rt.room_type_id
+                 WHERE r.room_id IN (
+                     SELECT room_id FROM bookings 
+                     WHERE (? < check_out AND ? > check_in)
+                 )";
+                 
+$stmt_occupied = $conn->prepare($sql_occupied);
+$stmt_occupied->bind_param("ss", $check_in, $check_out);
+$stmt_occupied->execute();
+$result_occupied = $stmt_occupied->get_result();
+
+if ($result_occupied->num_rows > 0) {
+    echo "<h2>Opptatte rom:</h2>";
+    echo "<table>";
+    echo "<tr><th>Romnummer</th><th>Type</th></tr>";
+    while ($row = $result_occupied->fetch_assoc()) {
+        echo "<tr>";
+        echo "<td>" . htmlspecialchars($row['room_number']) . "</td>";
+        echo "<td>" . htmlspecialchars($row['type_name']) . "</td>";
+        echo "</tr>";
+    }
+    echo "</table>";
+} else {
+    echo "<p>Ingen rom er opptatt i den angitte perioden.</p>";
+}
+$stmt_occupied->close();
+
+
 $conn->close();
+?>

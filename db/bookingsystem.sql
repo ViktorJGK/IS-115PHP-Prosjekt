@@ -62,7 +62,8 @@ CREATE TABLE `room_types` (
   `type_name` varchar(255) NOT NULL,
   `description` text NOT NULL,
   `max_adults` int(11) NOT NULL,
-  `max_children` int(11) NOT NULL
+  `max_children` int(11) NOT NULL,
+  `price` int(11) NOT NULL 
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
@@ -175,19 +176,6 @@ ALTER TABLE `bookings`
 ALTER TABLE `rooms`
   ADD CONSTRAINT `fk_room_type` FOREIGN KEY (`room_type_id`) REFERENCES `room_types` (`room_type_id`);
 COMMIT;
-
--- Sett inn noen testdata for rom i `rooms`-tabellen
-INSERT INTO `rooms` (`room_number`, `room_type_id`, `is_available`) VALUES
-('101', 1, 1),
-('102', 2, 1),
-('103', 3, 1),
-('104', 2, 1),
-('105', 1, 1);
-
--- Sett inn noen testdata for bookinger i `bookings`-tabellen
-INSERT INTO `bookings` (`user_id`, `room_id`, `check_in`, `check_out`, `adults`, `children`) VALUES
-(9, 1, '2024-10-01', '2024-10-05', 1, 0),  -- Rom 101, opptatt fra 1. til 5. oktober
-(11, 2, '2024-10-10', '2024-10-15', 2, 1);  -- Rom 102, opptatt fra 10. til 15. oktober
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
 /*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
