@@ -54,12 +54,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $username = $_POST['username'];
     $password = $_POST['password'];
     $email = $_POST['email'];
-    $role = $_POST['role'];
+    $role = 0;
 
-    // Validate role input
-    if (!in_array($role, [0, 1])) {
-        die("Ugyldig rolle valgt.");
-    }
 
     registerUser($username, $password, $email, $role);
 }
@@ -87,10 +83,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             <label for="email">E-post:</label>
             <input type="email" id="email" name="email" required>
 
-            <label for="role">Rolle:</label>
-            <select id="role" name="role">
-                <option value="0">Gjest</option>
-                <option value="1">Administrator</option>
             </select>
 
             <input type="submit" value="Registrer">
