@@ -29,6 +29,7 @@ $isAdmin = $userProfile && $userProfile['role'] == 1; // 'role' column indicates
         <?php if ($userProfile): ?>
             <?php if ($isAdmin): ?>
                 <?php include 'profiles/admin_dashboard.php'; ?>
+                <link rel="stylesheet" href="../css/admin.css">
             <?php else: ?>
                 <?php include 'profiles/guest_profile.php'; ?>
             <?php endif; ?>
