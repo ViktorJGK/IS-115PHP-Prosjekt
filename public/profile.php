@@ -1,31 +1,36 @@
 <?php
-include '../db_connect.php'; // inkluderer databse koblinmg fil
-include '../Components/header.php'; // inkluderer header
+include '../db_connect.php'; // Include the database connection
+include '../Components/header.php'; // Include the header
+include '../Components/functions/user_functions.php'; // Include the file with User, Admin, and Guest classes
 
-function getUserProfile($user_id)
-{
-    global $conn;
-    $sql = "SELECT * FROM users WHERE user_id = '$user_id'"; //sql spørring for å hente brukerdata
-    $result = $conn->query($sql); //utfører spøring
-    if ($result->num_rows > 0) {
-        return $result->fetch_assoc();
-    } else {
-        return null;
+// Initialize $userProfile based on session data
+$userProfile = null;
+
+if (isset($_SESSION['user_id'])) { // Check if the user is logged in
+    $user_id = $_SESSION['user_id'];
+    
+    // Check the user's role from the database
+    $sql = "SELECT role FROM users WHERE user_id = ?";
+    $stmt = $conn->prepare($sql);
+    $stmt->bind_param("i", $user_id);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    $userRole = $result->fetch_assoc()['role'] ?? null;
+    
+    // Initialize user as Admin or Guest based on role
+    if ($userRole === 1) {
+        $userProfile = new Admin($user_id, $conn);
+    } elseif ($userRole === 0) {
+        $userProfile = new Guest($user_id, $conn);
     }
 }
 
-//Initialiserer variabelen $userProfile med null
-$userProfile = null;
-if (isset($_SESSION['user_id'])) { //sjekker om bruker er innlogget
-    $userProfile = getUserProfile($_SESSION['user_id']); // Henter brukerprofilen ved hjelp av bruker-ID fra sesjonen
-}
-
-$isAdmin = $userProfile && $userProfile['role'] == 1; // 'role' column indicates admin (1) or guest (0)
+$isAdmin = $userProfile instanceof Admin; // Check if the user is an Admin
 ?>
 
 <div class="container">
     <div class="profile">
-        <!-- Logikk for hvilken profil du skal se -->
+        <!-- Logic for which profile to display -->
         <?php if ($userProfile): ?>
             <?php if ($isAdmin): ?>
                 <?php include 'profiles/admin_dashboard.php'; ?>

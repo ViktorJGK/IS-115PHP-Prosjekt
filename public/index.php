@@ -21,6 +21,30 @@ include '../db_connect.php';
 <body>
     <div class="container">
         <h1>Velkommen til vårt motell</h1>
+
+        <?php
+
+        function getUserProfile($user_id)
+        {
+            global $conn;
+            $sql = "SELECT * FROM users WHERE user_id = '$user_id'"; // SQL query to fetch user data
+            $result = $conn->query($sql); // Execute query
+            if ($result->num_rows > 0) {
+                return $result->fetch_assoc();
+            } else {
+                return null;
+            }
+        }
+
+        // Initialize the $userProfile variable as null
+        $userProfile = null;
+        if (isset($_SESSION['user_id'])) { // Check if the user is logged in
+            $userProfile = getUserProfile($_SESSION['user_id']); // Fetch the user profile using user ID from the session
+        }
+
+        // Only display the HTML form if the user is logged in (i.e., $userProfile is not null)
+        if ($userProfile) {
+            echo '
         <h2>Søk etter tilgjengelige rom</h2>
         <form action="available_rooms.php" method="POST">
             <label for="check_in">Innsjekkingsdato:</label>
@@ -37,6 +61,13 @@ include '../db_connect.php';
 
             <input type="submit" value="Sjekk tilgjengelighet">
         </form>
+    ';
+        } else {
+            echo "Logg deg inn for å kunne bestille rom :) ";
+        }
+        ?>
+
+
 
 
         <br><br>
@@ -44,8 +75,9 @@ include '../db_connect.php';
         <!-- Du kan inkludere mer dynamisk innhold her hvis ønskelig -->
     </div>
     <br>
-    <br>
+
     <div class="container">
+        <h4>Disse er romtypene vi har</h4>
         <?php
 
         $sql = "SELECT type_name, description, max_adults, max_children FROM room_types";
