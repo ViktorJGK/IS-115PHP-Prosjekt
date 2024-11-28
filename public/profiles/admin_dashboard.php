@@ -5,6 +5,9 @@ $allUsers = $userProfile->getAllUsers();
 // Determine the edit mode if a specific user ID is set
 $edit_user_id = isset($_POST['edit_user_id']) ? $_POST['edit_user_id'] : null;
 ?>
+<head>
+    <link rel="stylesheet" href="../css/admin.css">
+</head>
 
 <div>
     <div>

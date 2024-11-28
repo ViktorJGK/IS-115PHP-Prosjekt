@@ -71,8 +71,6 @@ include '../db_connect.php';
 
 
         <br><br>
-
-        <!-- Du kan inkludere mer dynamisk innhold her hvis ønskelig -->
     </div>
     <br>
 
