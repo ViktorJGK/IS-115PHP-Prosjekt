@@ -1,6 +1,6 @@
 <?php
-if (!$userProfile instanceof Admin) {
-    header("Location: ../logout.php"); // Redirect to an error page if not an admin
+if (!$userProfile instanceof User) {
+    header("Location: ../../logout.php"); // Redirect to an error page if not an admin
     exit;
 }
 ?>
