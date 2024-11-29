@@ -1,4 +1,10 @@
 <?php
+
+if (!$userProfile instanceof Admin) {
+    header("Location: ../logout.php"); // Redirect to an error page if not an admin
+    exit;
+}
+
 // Get all users from the database using the Admin class method
 $allUsers = $userProfile->getAllUsers();
 
