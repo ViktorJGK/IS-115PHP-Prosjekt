@@ -31,6 +31,71 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         exit;
     }
 }
+
+// Funksjon for å hente alle bookinger
+function getAllBookings($limit, $offset)
+{
+    global $conn;
+    $sql = "SELECT bookings.booking_id, bookings.check_in, bookings.check_out, 
+                   bookings.room_id, bookings.user_id, users.username 
+            FROM bookings 
+            JOIN rooms ON bookings.room_id = rooms.room_id 
+            JOIN users ON bookings.user_id = users.user_id
+            LIMIT ? OFFSET ?";
+    $stmt = $conn->prepare($sql);
+    if (!$stmt) {
+        die("SQL error: " . $conn->error);
+    }
+
+    $stmt->bind_param("ii", $limit, $offset);
+    if (!$stmt->execute()) {
+        die("Execution error: " . $stmt->error);
+    }
+    $result = $stmt->get_result();
+
+    if ($result && $result->num_rows > 0) {
+        return $result->fetch_all(MYSQLI_ASSOC);
+    } else {
+        return [];
+    }
+}
+
+
+
+$role_mapping = [
+    'admin' => 'Administrator',
+    'user' => 'User',
+    'guest' => 'Guest'
+];
+
+$limit = 10; // Set your desired limit
+$offset = 0; // Set your desired offset
+//$allUsers = getAllUsers($limit, $offset);
+$allBookings = getAllBookings($limit, $offset);
+
+/* Funksjon for debugging
+function debugData($allUsers, $allBookings)
+{
+    echo '<h3>Debugging: All Users</h3>';
+    echo '<pre>';
+    print_r($allUsers);
+    echo '</pre>';
+
+    echo '<h3>Debugging: All Bookings</h3>';
+    echo '<pre>';
+    print_r($allBookings);
+    echo '</pre>';
+}
+
+// Kall funksjonen for debugging
+debugData($allUsers, $allBookings);*/
+?>
+
+<!DOCTYPE html>
+<html lang="en"
+
+
+
 ?>
 
 <head>
@@ -100,6 +165,37 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         </tr>
                     <?php endif; ?>
                 <?php endforeach; ?>
+            </tbody>
+        </table>
+
+        <!-- Seksjon for bookinger -->
+        <h3>All Bookings</h3>
+        <table>
+            <thead>
+                <tr>
+                    <th>Booking ID</th>
+                    <th>Username</th>
+                    <th>Room Type</th>
+                    <th>Check-in</th>
+                    <th>Check-out</th>
+                </tr>
+            </thead>
+            <tbody>
+                <?php if (!empty($allBookings)): ?>
+                    <?php foreach ($allBookings as $booking): ?>
+                        <tr>
+                            <td><?php echo htmlspecialchars($booking['booking_id']); ?></td>
+                            <td><?php echo htmlspecialchars($booking['username']); ?></td>
+                            <td><?php echo htmlspecialchars($booking['room_type']); ?></td>
+                            <td><?php echo htmlspecialchars($booking['check_in']); ?></td>
+                            <td><?php echo htmlspecialchars($booking['check_out']); ?></td>
+                        </tr>
+                    <?php endforeach; ?>
+                <?php else: ?>
+                    <tr>
+                        <td colspan="5">Ingen bookinger funnet.</td>
+                    </tr>
+                <?php endif; ?>
             </tbody>
         </table>
     </div>
