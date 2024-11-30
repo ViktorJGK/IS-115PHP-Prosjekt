@@ -22,7 +22,7 @@ session_start(); //Kommer til å være med på hver side av prosjektet
 
         <!--- kan kun se dette hvis inlogget -->
         <?php if (isset($_SESSION['user_id'])): ?>
-            <form id="logout-form" action="../logout.php" method="POST" style="display:inline;"> <!--- Fører bruker til logout filen som gjør logout logikken -->
+            <form class="navbar" id="logout-form" action="../logout.php" method="POST" style="display:inline;"> <!--- Fører bruker til logout filen som gjør logout logikken -->
                 <a href="../logout.php" type="submit" id="logout">Logg Ut</a>
             </form>
         <?php endif; ?>
