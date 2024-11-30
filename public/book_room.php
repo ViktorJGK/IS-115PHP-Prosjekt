@@ -7,5 +7,6 @@ function bookRoom($room_id, $user_id, $check_in, $check_out, $adults, $children)
     } else {
         echo "Error: " . $sql . "<br>" . $conn->error;
     }
+
 }
 ?>
