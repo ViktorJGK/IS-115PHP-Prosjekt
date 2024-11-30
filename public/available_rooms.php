@@ -41,7 +41,7 @@ if (isset($_POST['check_in'], $_POST['check_out'], $_POST['adults'], $_POST['chi
     var_dump($children);
 
     // SQL-spørring for å finne tilgjengelige rom
-    $sql = "SELECT r.room_number, rt.type_name, rt.max_adults, rt.max_children, r.price
+    $sql = "SELECT r.room_id, rt.type_name, rt.max_adults, rt.max_children 
             FROM rooms r
             JOIN room_types rt ON r.room_type_id = rt.room_type_id
             WHERE r.room_id NOT IN (
@@ -78,7 +78,7 @@ if (isset($_POST['check_in'], $_POST['check_out'], $_POST['adults'], $_POST['chi
             // Starter en ny rad i tabellen
             echo "<tr>";
             // Viser romnummer, sikret mot XSS-angrep med htmlspecialchars
-            echo "<td>" . htmlspecialchars($row['room_number']) . "</td>";
+            echo "<td>" . htmlspecialchars($row['room_id']) . "</td>";
             // Viser romtypen (med en fallback for 'Ikke tilgjengelig' hvis verdien er null)
             echo "<td>" . htmlspecialchars($row['type_name'] ?? 'Ikke tilgjengelig') . "</td>";
             // Viser maks antall voksne

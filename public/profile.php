@@ -1,24 +1,23 @@
 <?php
+session_start(); // Start the session
+
 // Inkluderer databasetilkoblingen
 include '../db_connect.php';
+if ($conn->connect_error) {
+    die("Connection failed: " . $conn->connect_error);
+}
 
 // Inkluderer header-komponenten, som sannsynligvis inneholder toppseksjonen for nettsiden
 include '../Components/header.php';
 
-// Inkluderer en statisk HTML-side som kan inneholde en mal for brukerprofil
-include '../profile.html';
-
 // Funksjon for å hente brukerprofil basert på bruker-ID
 function getUserProfile($user_id) {
     global $conn; // Gjør databasetilkoblingen tilgjengelig i funksjonen
-
-    // SQL-spørring for å hente alle detaljer om brukeren med gitt ID
-    $sql = "SELECT * FROM users WHERE user_id = '$user_id'";
-
-    // Utfører spørringen
-    $result = $conn->query($sql);
-
-    // Sjekker om det finnes en rad i resultatet
+    $sql = "SELECT * FROM users WHERE user_id = ?";
+    $stmt = $conn->prepare($sql);
+    $stmt->bind_param("i", $user_id);
+    $stmt->execute();
+    $result = $stmt->get_result();
     if ($result->num_rows > 0) {
         return $result->fetch_assoc(); // Returnerer raden som en assosiativ array
     } else {
@@ -52,3 +51,24 @@ $isAdmin = $userProfile && $userProfile['role'] == 1; // 'role'-kolonnen angir a
         <?php endif; ?>
     </div>
 </div>
+<?php 
+function getBookings($user_id) {
+    global $conn;
+    $sql = "SELECT * FROM bookings WHERE user_id = ?";
+    $stmt = $conn->prepare($sql);
+    $stmt->bind_param("i", $user_id);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    return $result->fetch_all(MYSQLI_ASSOC);
+}
+
+// Hent bookinger for brukeren
+$bookings = [];
+if (isset($_SESSION['user_id'])) {
+    $bookings = getBookings($_SESSION['user_id']);
+}
+
+
+
+
+?>

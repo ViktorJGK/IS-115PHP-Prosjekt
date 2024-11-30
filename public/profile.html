@@ -1,11 +1,14 @@
+<?php
+session_start(); // Start the session
+?>
 <div class="container">
   <div class="profile">
-      <?php if ($userProfile): ?>
+      <?php if (!empty($userProfile)): ?>
           <h2>Velkommen, <?php echo htmlspecialchars($userProfile['username']); ?>!</h2>
           <p>Email: <?php echo htmlspecialchars($userProfile['email']); ?></p>
           
           <!-- Vis brukerens aktive bookinger -->
-          <?php if ($bookings): ?>
+          <?php if (!empty($bookings)): ?>
               <h3>Dine aktive bookinger</h3>
               <ul>
               <?php foreach ($bookings as $booking): ?>
@@ -13,7 +16,7 @@
                       Romtype: <?php echo htmlspecialchars($booking['room_type']); ?> <br>
                       Innsjekk: <?php echo htmlspecialchars($booking['check_in']); ?> <br>
                       Utsjekk: <?php echo htmlspecialchars($booking['check_out']); ?> <br>
-                      <a href="cancel_booking.php?booking_id=<?php echo $booking['id']; ?>">Kanseller</a>
+                      <a href="cancel_booking.php?booking_id=<?php echo htmlspecialchars($booking['id']); ?>">Kanseller</a>
                   </li>
               <?php endforeach; ?>
               </ul>
@@ -25,7 +28,7 @@
           <a href="edit_profile.php">Endre profilinformasjon</a>
           
           <!-- Administratorpanel, hvis brukeren er admin -->
-          <?php if ($userProfile['role'] == 1): ?>
+          <?php if (isset($userProfile['role']) && $userProfile['role'] == 1): ?>
               <h3>Administratorpanel</h3>
               <ul>
                   <li><a href="manage_rooms.php">Administrer rom</a></li>
@@ -39,3 +42,4 @@
       <?php endif; ?>
   </div>
 </div>
+
