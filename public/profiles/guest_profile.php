@@ -1,12 +1,12 @@
 <?php
-// Ensure the user is logged in as a User (not an admin)
+// Sikrer at bruker er admin
 if (!$userProfile instanceof User) {
-    header("Location: ../../logout.php"); // Redirect to an error page if not a user
+    header("Location: ../../logout.php");
     exit;
 }
 
-// Fetch bookings for the logged-in user
-$bookings = $userProfile->getUserBookings(); // No need to pass user ID explicitly now
+// Henter bookings for innlogget bruker
+$bookings = $userProfile->getUserBookings(); 
 ?>
 
 <div>
@@ -15,19 +15,24 @@ $bookings = $userProfile->getUserBookings(); // No need to pass user ID explicit
         <p>Velkommen, <?php echo htmlspecialchars($userProfile->getUsername()); ?>!</p>
         <p>Email: <?php echo htmlspecialchars($userProfile->getEmail()); ?></p>
     </div>
-    
-    <!-- Display user's bookings -->
-    <h3>Your Bookings</h3>
+
+    <h3>Dine Bookings</h3>
     <?php if (!empty($bookings)): ?>
         <ul>
             <?php foreach ($bookings as $booking): ?>
                 <li>
-                    Room: <?php echo htmlspecialchars($booking['room_number']); ?> 
-                    (<?php echo htmlspecialchars($booking['check_in']); ?> - <?php echo htmlspecialchars($booking['check_out']); ?>)
+                    Room: <?php echo htmlspecialchars($booking['room_number']); ?>
+                    (<?php
+                        // Convert check_in and check_out to dd-mm-yyyy format
+                        $check_in_date = new DateTime($booking['check_in']);
+                        $check_out_date = new DateTime($booking['check_out']);
+
+                        echo $check_in_date->format('d-m-Y') . ' - ' . $check_out_date->format('d-m-Y');
+                        ?>)
                 </li>
             <?php endforeach; ?>
         </ul>
     <?php else: ?>
-        <p>You have no bookings at the moment.</p>
+        <p> Du har ingen bookings for øyeblikket. Gå til forsiden for å se hvilke rom som er ledige. </p>
     <?php endif; ?>
 </div>
