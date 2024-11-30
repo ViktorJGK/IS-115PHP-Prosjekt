@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: 18. Sep, 2024 12:17 PM
+-- Generation Time: 29. Nov, 2024 19:18 PM
 -- Tjener-versjon: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -51,6 +51,17 @@ CREATE TABLE `rooms` (
   `is_available` tinyint(1) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
+--
+-- Dataark for tabell `rooms`
+--
+
+INSERT INTO `rooms` (`room_id`, `room_number`, `room_type_id`, `is_available`) VALUES
+(1, '101', 1, 1),
+(2, '102', 2, 1),
+(3, '103', 3, 1),
+(4, '104', 2, 1),
+(5, '105', 1, 1);
+
 -- --------------------------------------------------------
 
 --
@@ -62,17 +73,18 @@ CREATE TABLE `room_types` (
   `type_name` varchar(255) NOT NULL,
   `description` text NOT NULL,
   `max_adults` int(11) NOT NULL,
-  `max_children` int(11) NOT NULL
+  `max_children` int(11) NOT NULL,
+  `price` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dataark for tabell `room_types`
 --
 
-INSERT INTO `room_types` (`room_type_id`, `type_name`, `description`, `max_adults`, `max_children`) VALUES
-(1, 'Enkeltrom', 'Et komfortabelt enkeltrom med alle nødvendige fasiliteter.', 1, 0),
-(2, 'Dobbeltrom', 'Et rom med plass til to voksne og ett barn.', 2, 1),
-(3, 'Junior Suite', 'En romslig suite med plass til to voksne og to barn.', 2, 2);
+INSERT INTO `room_types` (`room_type_id`, `type_name`, `description`, `max_adults`, `max_children`, `price`) VALUES
+(1, 'Enkeltrom', 'Et komfortabelt enkeltrom med alle nødvendige fasiliteter.', 1, 0, 0),
+(2, 'Dobbeltrom', 'Et rom med plass til to voksne og ett barn.', 2, 1, 0),
+(3, 'Junior Suite', 'En romslig suite med plass til to voksne og to barn.', 2, 2, 0);
 
 -- --------------------------------------------------------
 
@@ -144,7 +156,7 @@ ALTER TABLE `bookings`
 -- AUTO_INCREMENT for table `rooms`
 --
 ALTER TABLE `rooms`
-  MODIFY `room_id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `room_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
 
 --
 -- AUTO_INCREMENT for table `room_types`
@@ -175,19 +187,6 @@ ALTER TABLE `bookings`
 ALTER TABLE `rooms`
   ADD CONSTRAINT `fk_room_type` FOREIGN KEY (`room_type_id`) REFERENCES `room_types` (`room_type_id`);
 COMMIT;
-
--- Sett inn noen testdata for rom i `rooms`-tabellen
-INSERT INTO `rooms` (`room_number`, `room_type_id`, `is_available`) VALUES
-('101', 1, 1),
-('102', 2, 1),
-('103', 3, 1),
-('104', 2, 1),
-('105', 1, 1);
-
--- Sett inn noen testdata for bookinger i `bookings`-tabellen
-INSERT INTO `bookings` (`user_id`, `room_id`, `check_in`, `check_out`, `adults`, `children`) VALUES
-(9, 1, '2024-10-01', '2024-10-05', 1, 0),  -- Rom 101, opptatt fra 1. til 5. oktober
-(11, 2, '2024-10-10', '2024-10-15', 2, 1);  -- Rom 102, opptatt fra 10. til 15. oktober
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
 /*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;

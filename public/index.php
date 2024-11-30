@@ -5,7 +5,7 @@ ini_set('display_startup_errors', 1); // Viser feil som oppstår under PHP-oppst
 error_reporting(E_ALL); // Rapporterer alle typer feil
 
 // Starter en ny eller eksisterende sesjon, nødvendig for funksjoner som innlogging
-session_start(); 
+//session_start(); 
 
 // Inkluderer header-komponenten som vanligvis inneholder sideoverskrifter og meny
 include "../Components/header.php";
