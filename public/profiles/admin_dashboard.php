@@ -8,9 +8,31 @@ if (!$userProfile instanceof Admin) {
 // Get all users from the database using the Admin class method
 $allUsers = $userProfile->getAllUsers();
 
-// Determine the edit mode if a specific user ID is set
+// Handle form submission for saving or canceling user edits
 $edit_user_id = isset($_POST['edit_user_id']) ? $_POST['edit_user_id'] : null;
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    if (isset($_POST['cancel'])) {
+        // Cancel the edit and reload the page
+        header('Location: ' . $_SERVER['PHP_SELF']);
+        exit;
+    }
+
+    // Check if it's an update action
+    if (isset($_POST['username'], $_POST['role'], $_POST['user_id'])) {
+        // Update user information
+        $username = $_POST['username'];
+        $role = $_POST['role'];
+        $user_id = $_POST['user_id'];
+
+        // Call the update method from Admin class
+        $userProfile->updateUser($user_id, $username, $role);
+        // Redirect to avoid resubmission of the form on page reload
+        header('Location: ' . $_SERVER['PHP_SELF']);
+        exit;
+    }
+}
 ?>
+
 <head>
     <link rel="stylesheet" href="../css/admin.css">
 </head>
