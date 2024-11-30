@@ -30,6 +30,24 @@ class User {
         }
     }
 
+    public function getUserBookings() {
+        // SQL query to join the bookings table with rooms to fetch the room_number
+        $sql = "
+            SELECT b.booking_id, b.check_in, b.check_out, r.room_number 
+            FROM bookings b 
+            JOIN rooms r ON b.room_id = r.room_id 
+            WHERE b.user_id = ?
+        ";
+        
+        $stmt = $this->conn->prepare($sql);
+        $stmt->bind_param("i", $this->user_id);
+        $stmt->execute();
+        $result = $stmt->get_result();
+        
+        return $result->fetch_all(MYSQLI_ASSOC); // Return all bookings with room number
+    }
+    
+
     public function getUsername() {
         return $this->username;
     }
@@ -41,10 +59,13 @@ class User {
     public function getRole() {
         return $this->role;
     }
+
+    public function getId() {
+        return $this->user_id;
+    }
 }
 
 class Admin extends User {
-
     public function getAllUsers() {
         $sql = "SELECT user_id, username, email, role, created_at FROM users";
         $result = $this->conn->query($sql);
@@ -65,6 +86,7 @@ class Admin extends User {
 }
 
 class Guest extends User {
-    
+    // You can add any guest-specific functionality here
 }
+
 ?>
