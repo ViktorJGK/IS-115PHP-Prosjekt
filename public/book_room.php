@@ -1,17 +1,52 @@
 <?php
-function bookRoom($room_id, $user_id, $check_in, $check_out, $adults, $children) {
-    global $conn;
-    $sql = "INSERT INTO reservations (room_id, user_id, check_in, check_out, adults, children) VALUES ('$room_id', '$user_id', '$check_in', '$check_out', '$adults', '$children')";
-    if ($conn->query($sql) === TRUE) {
-        echo "Room booked successfully";
-    } else {
-        echo "Error: " . $sql . "<br>" . $conn->error;
+include "../db_connect.php";
+include "../Components/header.php";
+
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
+error_reporting(E_ALL);
+
+if (isset($_POST['room_id'], $_POST['check_in'], $_POST['check_out'], $_POST['adults'], $_POST['children'])) {
+
+    // Sanitize input
+    $room_id = intval($_POST['room_id']);
+    $check_in = $_POST['check_in'];
+    $check_out = $_POST['check_out'];
+    $adults = intval($_POST['adults']);
+    $children = intval($_POST['children']);
+    $user_id = $_SESSION['user_id']; // Assumes user_id is stored in the session
+
+    // Ensure valid date range
+    if (strtotime($check_in) >= strtotime($check_out)) {
+        die("Ugyldig dato: Innsjekking må være før utsjekking.");
     }
 
-    echo "<td><form action='book_room.php' method='POST'>
-        <input type='hidden' name='room_id' value='" . htmlspecialchars($row['room_number']) . "'>
-        <input type='submit' value='Book nå'>
-      </form></td>";
+    try {
+        $conn->begin_transaction();
 
+        // Insert booking into the database
+        $sql = "INSERT INTO bookings (user_id, room_id, check_in, check_out, adults, children, created_at)
+                VALUES (?, ?, ?, ?, ?, ?, NOW())";
+        $stmt = $conn->prepare($sql);
+        $stmt->bind_param("iissii", $user_id, $room_id, $check_in, $check_out, $adults, $children);
+        $stmt->execute();
+
+        // Update room availability
+        $sql_update = "UPDATE rooms SET is_available = 0 WHERE room_id = ?";
+        $stmt_update = $conn->prepare($sql_update);
+        $stmt_update->bind_param("i", $room_id);
+        $stmt_update->execute();
+
+        $conn->commit();
+
+        // Redirect to confirmation
+        header("Location: confirmation.php?room_id=$room_id&status=success");
+        exit;
+    } catch (Exception $e) {
+        $conn->rollback();
+        die("Feil under booking: " . $e->getMessage());
+    }
+} else {
+    echo "<p>Ugyldig forespørsel.</p>";
 }
-?>
+$conn->close();
