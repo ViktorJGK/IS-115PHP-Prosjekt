@@ -130,6 +130,19 @@ ALTER TABLE `bookings`
   ADD KEY `fk_room` (`room_id`);
 
 --
+--
+
+ALTER TABLE bookings 
+ADD COLUMN total_price DECIMAL(10, 2) NOT NULL DEFAULT 0 AFTER children;
+--
+--
+UPDATE bookings b
+JOIN rooms r ON b.room_id = r.room_id
+JOIN room_types rt ON r.room_type_id = rt.room_type_id
+SET b.total_price = DATEDIFF(b.check_out, b.check_in) * rt.price;
+--
+--
+
 -- Indexes for table `rooms`
 --
 ALTER TABLE `rooms`
