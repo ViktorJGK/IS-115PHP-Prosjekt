@@ -141,6 +141,11 @@ ALTER TABLE `rooms`
   ADD PRIMARY KEY (`room_id`),
   ADD UNIQUE KEY `room_number` (`room_number`),
   ADD KEY `fk_room_type` (`room_type_id`);
+--
+ALTER TABLE rooms 
+ADD COLUMN unavailable_from DATE NULL,
+ADD COLUMN unavailable_to DATE NULL;
+
 
 --
 -- Indexes for table `room_types`
