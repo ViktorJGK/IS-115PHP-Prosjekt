@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: 29. Nov, 2024 19:18 PM
+-- Generation Time: 01. Des, 2024 14:47 PM
 -- Tjener-versjon: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -38,6 +38,13 @@ CREATE TABLE `bookings` (
   `created_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
+--
+-- Dataark for tabell `bookings`
+--
+
+INSERT INTO `bookings` (`booking_id`, `user_id`, `room_id`, `check_in`, `check_out`, `adults`, `children`, `created_at`) VALUES
+(7, 9, 2, '2024-12-08', '2024-12-15', 1, 1, '2024-12-01 13:00:59');
+
 -- --------------------------------------------------------
 
 --
@@ -57,7 +64,7 @@ CREATE TABLE `rooms` (
 
 INSERT INTO `rooms` (`room_id`, `room_number`, `room_type_id`, `is_available`) VALUES
 (1, '101', 1, 1),
-(2, '102', 2, 1),
+(2, '102', 2, 0),
 (3, '103', 3, 1),
 (4, '104', 2, 1),
 (5, '105', 1, 1);
@@ -82,9 +89,9 @@ CREATE TABLE `room_types` (
 --
 
 INSERT INTO `room_types` (`room_type_id`, `type_name`, `description`, `max_adults`, `max_children`, `price`) VALUES
-(1, 'Enkeltrom', 'Et komfortabelt enkeltrom med alle nødvendige fasiliteter.', 1, 0, 0),
-(2, 'Dobbeltrom', 'Et rom med plass til to voksne og ett barn.', 2, 1, 0),
-(3, 'Junior Suite', 'En romslig suite med plass til to voksne og to barn.', 2, 2, 0);
+(1, 'Enkeltrom', 'Et komfortabelt enkeltrom med alle nødvendige fasiliteter.', 1, 0, 450),
+(2, 'Dobbeltrom', 'Et rom med plass til to voksne og ett barn.', 2, 1, 600),
+(3, 'Junior Suite', 'En romslig suite med plass til to voksne og to barn.', 2, 2, 1000);
 
 -- --------------------------------------------------------
 
@@ -107,7 +114,8 @@ CREATE TABLE `users` (
 
 INSERT INTO `users` (`user_id`, `username`, `password`, `email`, `role`, `created_at`) VALUES
 (9, 'Viktor_0', '$2y$10$7ufUc9qClqNbb0Q7gXwkLuZBjzkkF7U692PNYBtEiAnhiG/1W8gmi', 'viktorkallhovd02@gmail.com', 0, '2024-09-13 11:30:02'),
-(11, 'Viktor_1', '$2y$10$jX0J2v7W4HdHBvsILwLfo.aXsRS1ujM8jAQgmPhRgkTSr.K5/gxN6', 'viktor@gmail.com', 1, '2024-09-13 12:34:09');
+(11, 'Viktor_1', '$2y$10$jX0J2v7W4HdHBvsILwLfo.aXsRS1ujM8jAQgmPhRgkTSr.K5/gxN6', 'viktor@gmail.com', 1, '2024-09-13 12:34:09'),
+(12, 'Kasvav1', '$2y$10$H76mf2DAqV9we2Ymwe8Ai.1FC.uHq3rB9WmOt5bd.r6w.wR1QWtHy', 'viktokrkoak@gmiaul.com', 0, '2024-11-30 18:47:44');
 
 --
 -- Indexes for dumped tables
@@ -150,7 +158,7 @@ ALTER TABLE `users`
 -- AUTO_INCREMENT for table `bookings`
 --
 ALTER TABLE `bookings`
-  MODIFY `booking_id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `booking_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
 
 --
 -- AUTO_INCREMENT for table `rooms`
@@ -168,7 +176,7 @@ ALTER TABLE `room_types`
 -- AUTO_INCREMENT for table `users`
 --
 ALTER TABLE `users`
-  MODIFY `user_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=12;
+  MODIFY `user_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=13;
 
 --
 -- Begrensninger for dumpede tabeller
