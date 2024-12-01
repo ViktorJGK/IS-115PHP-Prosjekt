@@ -18,23 +18,43 @@ $bookings = $userProfile->getUserBookings();
 
     <h3>Dine Bookings</h3>
     <?php if (!empty($bookings)): ?>
-        <ul>
-            <?php foreach ($bookings as $booking): ?>
-                <li>
-                    Room: <?php echo htmlspecialchars($booking['room_number']); ?>
-                    <?php echo htmlspecialchars($booking['room_type']); ?>
-                    (<?php
-                        // Convert check_in and check_out to dd-mm-yyyy format
-                        $check_in_date = new DateTime($booking['check_in']);
-                        $check_out_date = new DateTime($booking['check_out']);
+        <table border="1" cellpadding="5" cellspacing="0">
+            <thead>
+                <tr>
+                    <th>Booking ID</th>
+                    <th>Rom</th>
+                    <th>Rom Type</th>
+                    <th>Innsjekk</th>
+                    <th>Utsjekk</th>
+                    <th>Antall Voksne</th>
+                    <th>Antall Barn</th>
+                    <th>Totalpris</th>
+                </tr>
+            </thead>
+            <tbody>
+                <?php foreach ($bookings as $booking): ?>
+                    <tr>
+                        <td><?php echo htmlspecialchars($booking['booking_id']); ?></td>
+                        <td><?php echo htmlspecialchars($booking['room_number']); ?></td>
+                        <td><?php echo htmlspecialchars($booking['room_type']); ?></td>
+                        <td><?php
+                            $check_in_date = new DateTime($booking['check_in']);
+                            echo $check_in_date->format('d-m-Y');
+                        ?></td>
+                        <td><?php
+                            $check_out_date = new DateTime($booking['check_out']);
+                            echo $check_out_date->format('d-m-Y');
+                        ?></td>
+                        <td><?php echo htmlspecialchars($booking['adults']); ?></td>
+                        <td><?php echo htmlspecialchars($booking['children']); ?></td>
+                        <td><?php echo htmlspecialchars(number_format($booking['total_price'], 2)); ?> NOK</td>
+                        <td><a href="receipt.php?booking_id=<?php echo $booking['booking_id']; ?>">Vis Kvittering</a></td>
 
-                        echo $check_in_date->format('d-m-Y') . ' - ' . $check_out_date->format('d-m-Y');
-                        ?>)
-                </li>
-            <?php endforeach; ?>
-
-        </ul>
+                    </tr>
+                <?php endforeach; ?>
+            </tbody>
+        </table>
     <?php else: ?>
-        <p> Du har ingen bookings for øyeblikket. Gå til forsiden for å se hvilke rom som er ledige. </p>
+        <p>Du har ingen bookings for øyeblikket. Gå til forsiden for å se hvilke rom som er ledige.</p>
     <?php endif; ?>
 </div>
