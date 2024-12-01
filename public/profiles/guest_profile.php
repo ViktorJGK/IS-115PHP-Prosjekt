@@ -6,7 +6,7 @@ if (!$userProfile instanceof User) {
 }
 
 // Henter bookings for innlogget bruker
-$bookings = $userProfile->getUserBookings(); 
+$bookings = $userProfile->getUserBookings();
 ?>
 
 <div>
@@ -22,6 +22,7 @@ $bookings = $userProfile->getUserBookings();
             <?php foreach ($bookings as $booking): ?>
                 <li>
                     Room: <?php echo htmlspecialchars($booking['room_number']); ?>
+                    <?php echo htmlspecialchars($booking['room_type']); ?>
                     (<?php
                         // Convert check_in and check_out to dd-mm-yyyy format
                         $check_in_date = new DateTime($booking['check_in']);
@@ -31,6 +32,7 @@ $bookings = $userProfile->getUserBookings();
                         ?>)
                 </li>
             <?php endforeach; ?>
+
         </ul>
     <?php else: ?>
         <p> Du har ingen bookings for øyeblikket. Gå til forsiden for å se hvilke rom som er ledige. </p>

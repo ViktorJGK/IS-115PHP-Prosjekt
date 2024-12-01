@@ -31,21 +31,31 @@ class User {
     }
 
     public function getUserBookings() {
-        // SQL query to join the bookings table with rooms to fetch the room_number
+        // SQL query to join the bookings table with rooms and room_types to fetch detailed information
         $sql = "
-            SELECT b.booking_id, b.check_in, b.check_out, r.room_number 
-            FROM bookings b 
-            JOIN rooms r ON b.room_id = r.room_id 
+            SELECT 
+                b.booking_id, 
+                b.check_in, 
+                b.check_out, 
+                r.room_number, 
+                rt.type_name AS room_type, 
+                r.is_available 
+            FROM bookings b
+            JOIN rooms r ON b.room_id = r.room_id
+            JOIN room_types rt ON r.room_type_id = rt.room_type_id
             WHERE b.user_id = ?
         ";
         
+        // Prepare and execute the statement
         $stmt = $this->conn->prepare($sql);
-        $stmt->bind_param("i", $this->user_id);
+        $stmt->bind_param("i", $this->user_id); // Bind user_id as an integer parameter
         $stmt->execute();
         $result = $stmt->get_result();
         
-        return $result->fetch_all(MYSQLI_ASSOC); // Return all bookings with room number
+        // Fetch all bookings with room number, room type, and availability status
+        return $result->fetch_all(MYSQLI_ASSOC);
     }
+    
     
 
     public function getUsername() {
