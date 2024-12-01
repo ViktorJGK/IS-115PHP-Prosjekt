@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: 01. Des, 2024 14:47 PM
+-- Generation Time: 01. Des, 2024 18:42 PM
 -- Tjener-versjon: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -35,6 +35,7 @@ CREATE TABLE `bookings` (
   `check_out` date NOT NULL,
   `adults` int(11) NOT NULL,
   `children` int(11) NOT NULL,
+  `total_price` decimal(10,2) NOT NULL DEFAULT 0.00,
   `created_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
@@ -42,8 +43,8 @@ CREATE TABLE `bookings` (
 -- Dataark for tabell `bookings`
 --
 
-INSERT INTO `bookings` (`booking_id`, `user_id`, `room_id`, `check_in`, `check_out`, `adults`, `children`, `created_at`) VALUES
-(7, 9, 2, '2024-12-08', '2024-12-15', 1, 1, '2024-12-01 13:00:59');
+INSERT INTO `bookings` (`booking_id`, `user_id`, `room_id`, `check_in`, `check_out`, `adults`, `children`, `total_price`, `created_at`) VALUES
+(7, 9, 2, '2024-12-08', '2024-12-15', 1, 1, 4200.00, '2024-12-01 16:51:57');
 
 -- --------------------------------------------------------
 
@@ -105,17 +106,21 @@ CREATE TABLE `users` (
   `password` varchar(255) NOT NULL,
   `email` varchar(255) NOT NULL,
   `role` tinyint(1) NOT NULL COMMENT 'boolean 0 = gjest, 1 = admin',
-  `created_at` timestamp NULL DEFAULT current_timestamp()
+  `created_at` timestamp NULL DEFAULT current_timestamp(),
+  `failed_attempts` int(11) DEFAULT 0,
+  `lockout_until` datetime DEFAULT NULL,
+  `last_failed_attempt` datetime DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dataark for tabell `users`
 --
 
-INSERT INTO `users` (`user_id`, `username`, `password`, `email`, `role`, `created_at`) VALUES
-(9, 'Viktor_0', '$2y$10$7ufUc9qClqNbb0Q7gXwkLuZBjzkkF7U692PNYBtEiAnhiG/1W8gmi', 'viktorkallhovd02@gmail.com', 0, '2024-09-13 11:30:02'),
-(11, 'Viktor_1', '$2y$10$jX0J2v7W4HdHBvsILwLfo.aXsRS1ujM8jAQgmPhRgkTSr.K5/gxN6', 'viktor@gmail.com', 1, '2024-09-13 12:34:09'),
-(12, 'Kasvav1', '$2y$10$H76mf2DAqV9we2Ymwe8Ai.1FC.uHq3rB9WmOt5bd.r6w.wR1QWtHy', 'viktokrkoak@gmiaul.com', 0, '2024-11-30 18:47:44');
+INSERT INTO `users` (`user_id`, `username`, `password`, `email`, `role`, `created_at`, `failed_attempts`, `lockout_until`, `last_failed_attempt`) VALUES
+(9, 'Viktor_0', '$2y$10$7ufUc9qClqNbb0Q7gXwkLuZBjzkkF7U692PNYBtEiAnhiG/1W8gmi', 'viktorkallhovd02@gmail.com', 0, '2024-09-13 11:30:02', 0, NULL, NULL),
+(11, 'Viktor_1', '$2y$10$jX0J2v7W4HdHBvsILwLfo.aXsRS1ujM8jAQgmPhRgkTSr.K5/gxN6', 'viktor@gmail.com', 1, '2024-09-13 12:34:09', 0, NULL, NULL),
+(12, 'Kasvav1', '$2y$10$H76mf2DAqV9we2Ymwe8Ai.1FC.uHq3rB9WmOt5bd.r6w.wR1QWtHy', 'viktokrkoak@gmiaul.com', 0, '2024-11-30 18:47:44', 0, NULL, NULL),
+(17, '123', '$2y$10$6OhqcnxZlUGUA/b/bAyL.OdlsqpSwvHYk20Aq5r7tZVCESQRInSw.', '123@123.com', 0, '2024-12-01 17:09:34', 3, '2024-12-01 19:25:02', '2024-12-01 18:25:02');
 
 --
 -- Indexes for dumped tables
@@ -130,19 +135,6 @@ ALTER TABLE `bookings`
   ADD KEY `fk_room` (`room_id`);
 
 --
---
-
-ALTER TABLE bookings 
-ADD COLUMN total_price DECIMAL(10, 2) NOT NULL DEFAULT 0 AFTER children;
---
---
-UPDATE bookings b
-JOIN rooms r ON b.room_id = r.room_id
-JOIN room_types rt ON r.room_type_id = rt.room_type_id
-SET b.total_price = DATEDIFF(b.check_out, b.check_in) * rt.price;
---
---
-
 -- Indexes for table `rooms`
 --
 ALTER TABLE `rooms`
@@ -189,7 +181,7 @@ ALTER TABLE `room_types`
 -- AUTO_INCREMENT for table `users`
 --
 ALTER TABLE `users`
-  MODIFY `user_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=13;
+  MODIFY `user_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=18;
 
 --
 -- Begrensninger for dumpede tabeller
