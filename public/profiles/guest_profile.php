@@ -26,9 +26,7 @@ $bookings = $userProfile->getUserBookings();
                     <th>Rom Type</th>
                     <th>Innsjekk</th>
                     <th>Utsjekk</th>
-                    <th>Antall Voksne</th>
-                    <th>Antall Barn</th>
-                    <th>Totalpris</th>
+                    <th>Kvittering</th>
                 </tr>
             </thead>
             <tbody>
@@ -45,9 +43,7 @@ $bookings = $userProfile->getUserBookings();
                             $check_out_date = new DateTime($booking['check_out']);
                             echo $check_out_date->format('d-m-Y');
                         ?></td>
-                        <td><?php echo htmlspecialchars($booking['adults']); ?></td>
-                        <td><?php echo htmlspecialchars($booking['children']); ?></td>
-                        <td><?php echo htmlspecialchars(number_format($booking['total_price'], 2)); ?> NOK</td>
+                       
                         <td><a href="receipt.php?booking_id=<?php echo $booking['booking_id']; ?>">Vis Kvittering</a></td>
 
                     </tr>
