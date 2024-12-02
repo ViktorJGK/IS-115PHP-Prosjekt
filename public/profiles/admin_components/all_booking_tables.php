@@ -27,28 +27,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         exit;
     }
 
-    if (isset($_POST['save_booking'], $_POST['booking_id'], $_POST['check_in'], $_POST['check_out'], $_POST['room_type'])) {
-        $booking_id = (int) $_POST['booking_id'];
-        $check_in = $_POST['check_in'];
-        $check_out = $_POST['check_out'];
-        $room_type = $_POST['room_type'];
-
-        $stmt = $conn->prepare("
-            UPDATE bookings 
-            JOIN rooms ON bookings.room_id = rooms.room_id 
-            JOIN room_types ON rooms.room_type_id = room_types.room_type_id 
-            SET bookings.check_in = ?, bookings.check_out = ?, room_types.type_name = ? 
-            WHERE bookings.booking_id = ?
-        ");
-        $stmt->bind_param("sssi", $check_in, $check_out, $room_type, $booking_id);
-        if (!$stmt->execute()) {
-            die("Error updating booking: " . $stmt->error);
-        }
-
-        header('Location: ' . $_SERVER['PHP_SELF']);
-        exit;
-    }
-
     if (isset($_POST['delete_booking_id'])) {
         $booking_id = (int) $_POST['delete_booking_id'];
 
@@ -90,75 +68,41 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
     }
 }
-
 ?>
 
-
-
 <h3>All Bookings</h3>
-            <table>
-                <thead>
-                    <tr>
-                        <th>Booking ID</th>
-                        <th>Username</th>
-                        <th>Room Type</th>
-                        <th>Check-in</th>
-                        <th>Check-out</th>
-                        <th>Actions</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <?php if (!empty($allBookings)): ?>
-                        <?php foreach ($allBookings as $booking): ?>
-                            <?php if (isset($_POST['edit_booking_id']) && $_POST['edit_booking_id'] == $booking['booking_id']): ?>
-                                <tr>
-                                    <form action="" method="post">
-                                        <td><?php echo htmlspecialchars($booking['booking_id']); ?></td>
-                                        <td><?php echo htmlspecialchars($booking['username']); ?></td>
-                                        <td>
-                                            <select name="room_type">
-                                                <?php
-                                                $roomTypes->getRoomTypes();
-                                                foreach ($roomTypes as $roomType) {
-                                                    $selected = $booking['room_type'] === $roomType['type_name'] ? 'selected' : '';
-                                                    echo "<option value='{$roomType['type_name']}' $selected>{$roomType['type_name']}</option>";
-                                                }
-                                                ?>
-                                            </select>
-                                        </td>
-                                        <td><input type="date" name="check_in" value="<?php echo htmlspecialchars($booking['check_in']); ?>"></td>
-                                        <td><input type="date" name="check_out" value="<?php echo htmlspecialchars($booking['check_out']); ?>"></td>
-                                        <td>
-                                            <input type="hidden" name="booking_id" value="<?php echo htmlspecialchars($booking['booking_id']); ?>">
-                                            <button type="submit" name="save_booking">Save</button>
-                                            <button type="submit" name="cancel_edit" value="1">Cancel</button>
-                                        </td>
-                                    </form>
-                                </tr>
-                            <?php else: ?>
-                                <tr>
-                                    <td><?php echo htmlspecialchars($booking['booking_id']); ?></td>
-                                    <td><?php echo htmlspecialchars($booking['username']); ?></td>
-                                    <td><?php echo htmlspecialchars($booking['room_type']); ?></td>
-                                    <td><?php echo htmlspecialchars($booking['check_in']); ?></td>
-                                    <td><?php echo htmlspecialchars($booking['check_out']); ?></td>
-                                    <td>
-                                        <form action="" method="post" style="display:inline-block;">
-                                            <input type="hidden" name="edit_booking_id" value="<?php echo htmlspecialchars($booking['booking_id']); ?>">
-                                            <button type="submit">Edit</button>
-                                        </form>
-                                        <form action="" method="post" style="display:inline-block;">
-                                            <input type="hidden" name="delete_booking_id" value="<?php echo htmlspecialchars($booking['booking_id']); ?>">
-                                            <button type="submit">Delete</button>
-                                        </form>
-                                    </td>
-                                </tr>
-                            <?php endif; ?>
-                        <?php endforeach; ?>
-                    <?php else: ?>
-                        <tr>
-                            <td colspan="6">No bookings found.</td>
-                        </tr>
-                    <?php endif; ?>
-                </tbody>
-            </table>
+<table>
+    <thead>
+        <tr>
+            <th>Booking ID</th>
+            <th>Username</th>
+            <th>Room Type</th>
+            <th>Check-in</th>
+            <th>Check-out</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        <?php if (!empty($allBookings)): ?>
+            <?php foreach ($allBookings as $booking): ?>
+                <tr>
+                    <td><?php echo htmlspecialchars($booking['booking_id']); ?></td>
+                    <td><?php echo htmlspecialchars($booking['username']); ?></td>
+                    <td><?php echo htmlspecialchars($booking['room_type']); ?></td>
+                    <td><?php echo htmlspecialchars($booking['check_in']); ?></td>
+                    <td><?php echo htmlspecialchars($booking['check_out']); ?></td>
+                    <td>
+                        <form action="" method="post" style="display:inline-block;">
+                            <input type="hidden" name="delete_booking_id" value="<?php echo htmlspecialchars($booking['booking_id']); ?>">
+                            <button type="submit">Delete</button>
+                        </form>
+                    </td>
+                </tr>
+            <?php endforeach; ?>
+        <?php else: ?>
+            <tr>
+                <td colspan="6">No bookings found.</td>
+            </tr>
+        <?php endif; ?>
+    </tbody>
+</table>
