@@ -21,7 +21,7 @@ if (isset($_POST['check_in'], $_POST['check_out'], $_POST['adults'], $_POST['chi
 
     // Søk etter ledige rom basert på bookings-tabellen og tilgjengelighet
     $sql_available = "
-        SELECT r.room_id, r.room_number, rt.type_name, rt.max_adults, rt.max_children, rt.price 
+        SELECT r.room_id, r.room_number, rt.type_name, rt.description, rt.max_adults, rt.max_children, rt.price 
         FROM rooms r
         JOIN room_types rt ON r.room_type_id = rt.room_type_id
         WHERE r.is_available = 1
@@ -48,19 +48,28 @@ if (isset($_POST['check_in'], $_POST['check_out'], $_POST['adults'], $_POST['chi
     if ($result_available->num_rows > 0) {
         echo "<form method='POST' action='book_room.php'>";
         echo "<table>";
-        echo "<tr><th>Romnummer</th><th>Type</th><th>Maks voksne</th><th>Maks barn</th><th>Pris</th><th>Velg</th></tr>";
+echo "<tr>
+        <th>Romnummer</th>
+        <th>Type</th>
+        <th>Beskrivelse</th>
+        <th>Maks voksne</th>
+        <th>Maks barn</th>
+        <th>Pris</th>
+        <th>Velg</th>
+      </tr>";
+while ($row = $result_available->fetch_assoc()) {
+    echo "<tr>
+            <td>" . htmlspecialchars($row['room_number']) . "</td>
+            <td>" . htmlspecialchars($row['type_name'] ?? 'Ikke tilgjengelig') . "</td>
+            <td>" . htmlspecialchars($row['description'] ?? 'Ikke tilgjengelig') . "</td>
+            <td>" . htmlspecialchars($row['max_adults']) . "</td>
+            <td>" . htmlspecialchars($row['max_children']) . "</td>
+            <td>" . htmlspecialchars($row['price']) . " NOK</td>
+            <td><button type='submit' name='room_id' value='" . htmlspecialchars($row['room_id']) . "'>Book</button></td>
+          </tr>";
+}
+echo "</table>";
 
-        while ($row = $result_available->fetch_assoc()) {
-            echo "<tr>
-                    <td>" . htmlspecialchars($row['room_number']) . "</td>
-                    <td>" . htmlspecialchars($row['type_name'] ?? 'Ikke tilgjengelig') . "</td>
-                    <td>" . htmlspecialchars($row['max_adults']) . "</td>
-                    <td>" . htmlspecialchars($row['max_children']) . "</td>
-                    <td>" . htmlspecialchars($row['price']) . " NOK</td>
-                    <td><button type='submit' name='room_id' value='" . htmlspecialchars($row['room_id']) . "'>Book</button></td>
-                  </tr>";
-        }
-        echo "</table>";
 
         // Skjulte felt for å sende data videre
         echo "<input type='hidden' name='check_in' value='" . htmlspecialchars($check_in) . "'>";
@@ -112,3 +121,45 @@ if (isset($_POST['check_in'], $_POST['check_out'], $_POST['adults'], $_POST['chi
 
 $conn->close();
 ?>
+
+<style>
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-bottom: 20px;
+    }
+
+    th, td {
+        border: 1px solid #ddd;
+        padding: 8px;
+        text-align: left;
+    }
+
+    th {
+        background-color: #f4f4f4;
+        font-weight: bold;
+    }
+
+    td:nth-child(3) {
+        width: 40%; /* Øk bredden for beskrivelsen */
+    }
+
+    td:nth-child(4), td:nth-child(5), td:nth-child(6) {
+        width: 10%; /* Begrens bredden for maks voksne, barn, og pris */
+        text-align: center; /* Sentrer tallverdier */
+    }
+
+    button {
+        padding: 5px 10px;
+        background-color: #007bff;
+        color: #fff;
+        border: none;
+        border-radius: 3px;
+        cursor: pointer;
+    }
+
+    button:hover {
+        background-color: #0056b3;
+    }
+</style>
+
