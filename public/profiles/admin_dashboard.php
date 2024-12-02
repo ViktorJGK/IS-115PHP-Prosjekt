@@ -1,16 +1,18 @@
 <?php
 ob_start(); // Start output buffering
 
-// ekstra sikkerhet mot uautorisert tilgang
+include_once '../Components/functions/user_functions.php';
+
+// Start session and ensure user authentication
 if (!isset($userProfile) || !$userProfile instanceof Admin) {
     header("Location: ../../logout.php");
     exit;
 }
 
-// henter alle brukere fra databsen ved bruk av admin klassen
+// Fetch all users using Admin's method
 $allUsers = $userProfile->getAllUsers();
 
-// Hånterer form imput for lagring eller kanselering av bruker sin redigering
+// Handle form submission for saving or canceling user edits
 $edit_user_id = isset($_POST['edit_user_id']) ? $_POST['edit_user_id'] : null;
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (isset($_POST['cancel'])) {
@@ -28,54 +30,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 }
 
-// kan vel inkludre denne i user_functions.php
-function getAllBookings($limit, $offset)
-{
-    global $conn;
-    $sql = "SELECT bookings.booking_id, bookings.check_in, bookings.check_out, 
-                   users.username, room_types.type_name AS room_type 
-            FROM bookings 
-            JOIN rooms ON bookings.room_id = rooms.room_id 
-            JOIN room_types ON rooms.room_type_id = room_types.room_type_id 
-            JOIN users ON bookings.user_id = users.user_id
-            LIMIT ? OFFSET ?";
-    $stmt = $conn->prepare($sql);
-    if (!$stmt) {
-        die("SQL error: " . $conn->error);
-    }
-
-    $stmt->bind_param("ii", $limit, $offset);
-    if (!$stmt->execute()) {
-        die("Execution error: " . $stmt->error);
-    }
-    $result = $stmt->get_result();
-
-    return $result && $result->num_rows > 0 ? $result->fetch_all(MYSQLI_ASSOC) : [];
-}
-
-// kan vel inkludre denne i user_functions.php
-function getRoomTypes()
-{
-    global $conn;
-    $result = $conn->query("SELECT type_name FROM room_types");
-    return $result ? $result->fetch_all(MYSQLI_ASSOC) : [];
-}
-
-// kan vel inkludre denne i user_functions.php
-function getAllRooms()
-{
-    global $conn;
-    $sql = "SELECT room_id, room_number, type_name, is_available, unavailable_from, unavailable_to 
-    FROM rooms 
-    JOIN room_types ON rooms.room_type_id = room_types.room_type_id";
-    $result = $conn->query($sql);
-    return $result ? $result->fetch_all(MYSQLI_ASSOC) : [];
-}
-
-
+// Set limits for bookings and use the Admin's method to get bookings
 $limit = 10;
 $offset = 0;
-$allBookings = getAllBookings($limit, $offset);
+$allBookings = $userProfile->getAllBookings($limit, $offset);
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (isset($_POST['cancel_edit'])) {
@@ -100,7 +58,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         exit;
     }
 
-
     if (isset($_POST['save_booking'], $_POST['booking_id'], $_POST['check_in'], $_POST['check_out'], $_POST['room_type'])) {
         $booking_id = (int) $_POST['booking_id'];
         $check_in = $_POST['check_in'];
@@ -116,7 +73,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         ");
         $stmt->bind_param("sssi", $check_in, $check_out, $room_type, $booking_id);
         if (!$stmt->execute()) {
-            die("Feil under oppdatering av booking: " . $stmt->error);
+            die("Error updating booking: " . $stmt->error);
         }
 
         header('Location: ' . $_SERVER['PHP_SELF']);
@@ -126,7 +83,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (isset($_POST['delete_booking_id'])) {
         $booking_id = (int) $_POST['delete_booking_id'];
 
+        // Begin a transaction
         $conn->begin_transaction();
+
         try {
             // Get the room ID associated with the booking
             $stmt = $conn->prepare("SELECT room_id FROM bookings WHERE booking_id = ?");
@@ -137,34 +96,35 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $result = $stmt->get_result();
             $room_id = $result->fetch_assoc()['room_id'];
 
-            // Sletter booking
+            // Delete the booking
             $stmt = $conn->prepare("DELETE FROM bookings WHERE booking_id = ?");
             $stmt->bind_param("i", $booking_id);
             if (!$stmt->execute()) {
                 throw new Exception("Error deleting booking: " . $stmt->error);
             }
 
-            // Oppdaterer rommets tilgjengelighet
+            // Update the room's availability
             $stmt = $conn->prepare("UPDATE rooms SET is_available = 1 WHERE room_id = ?");
             $stmt->bind_param("i", $room_id);
             if (!$stmt->execute()) {
                 throw new Exception("Error updating room availability: " . $stmt->error);
             }
 
-            // commiter
+            // Commit the transaction
             $conn->commit();
             header('Location: ' . $_SERVER['PHP_SELF']);
             exit;
         } catch (Exception $e) {
-            // Rollback hvis feil
+            // Rollback the transaction on error
             $conn->rollback();
             die("Error processing deletion: " . $e->getMessage());
         }
     }
 }
 
-ob_end_flush(); // Sender outpuyt
+ob_end_flush(); // Send all output
 ?>
+
 
 <html lang="en">
 
@@ -257,7 +217,7 @@ ob_end_flush(); // Sender outpuyt
                                         <td>
                                             <select name="room_type">
                                                 <?php
-                                                $roomTypes = getRoomTypes();
+                                                $roomTypes->getRoomTypes();
                                                 foreach ($roomTypes as $roomType) {
                                                     $selected = $booking['room_type'] === $roomType['type_name'] ? 'selected' : '';
                                                     echo "<option value='{$roomType['type_name']}' $selected>{$roomType['type_name']}</option>";
@@ -322,7 +282,7 @@ ob_end_flush(); // Sender outpuyt
             </thead>
             <tbody>
                 <?php
-                $allRooms = getAllRooms();
+                $allRooms = $userProfile->getAllRooms();
                 foreach ($allRooms as $room): ?>
                     <tr>
                         <td><?php echo htmlspecialchars($room['room_id']); ?></td>
