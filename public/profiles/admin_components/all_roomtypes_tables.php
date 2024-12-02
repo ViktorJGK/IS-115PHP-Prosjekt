@@ -1,25 +1,27 @@
 <?php
-// Handle form submissions for updating room types
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+// Behandle skjema for oppdatering av romtyper
+if ($_SERVER['REQUEST_METHOD'] === 'POST') { // Sjekker om skjemaet ble sendt med POST-metoden
     if (isset($_POST['update_roomtype'], $_POST['room_type_id'], $_POST['type_name'], $_POST['description'], $_POST['max_adults'], $_POST['max_children'])) {
-        $room_type_id = (int)$_POST['room_type_id'];
-        $type_name = $_POST['type_name'];
-        $description = $_POST['description'];
-        $max_adults = (int)$_POST['max_adults'];
-        $max_children = (int)$_POST['max_children'];
+        // Henter og sikrer data fra skjemaet
+        $room_type_id = (int)$_POST['room_type_id']; // Romtype-ID
+        $type_name = $_POST['type_name']; // Navn på romtypen
+        $description = $_POST['description']; // Beskrivelse av romtypen
+        $max_adults = (int)$_POST['max_adults']; // Maks voksne tillatt
+        $max_children = (int)$_POST['max_children']; // Maks barn tillatt
 
+        // Oppdaterer romtypen i databasen
         $stmt = $conn->prepare("UPDATE room_types 
                                 SET type_name = ?, description = ?, max_adults = ?, max_children = ? 
                                 WHERE room_type_id = ?");
         $stmt->bind_param("ssiii", $type_name, $description, $max_adults, $max_children, $room_type_id);
 
+        // Utfører oppdateringen og håndterer feil
         if (!$stmt->execute()) {
-            die("Error updating room type: " . $stmt->error);
+            die("Error updating room type: " . $stmt->error); // Stopper og viser feil hvis oppdatering mislykkes
         }
     }
 }
 ?>
-
 
 <h3>All Room Types</h3>
 <table>
@@ -34,16 +36,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     </thead>
     <tbody>
         <?php
-        // Check if a room type is being edited
+        // Sjekker om en romtype er under redigering
         $edit_roomtype_id = isset($_POST['edit_roomtype_id']) ? (int)$_POST['edit_roomtype_id'] : null;
 
-        // Fetch all room types
+        // Henter alle romtyper fra databasen
         $sql = "SELECT * FROM room_types";
         $result = $conn->query($sql);
 
-        if ($result->num_rows > 0):
-            while ($row = $result->fetch_assoc()):
+        if ($result->num_rows > 0): // Sjekker om det finnes romtyper
+            while ($row = $result->fetch_assoc()): // Går gjennom hver rad (romtype)
                 if ($edit_roomtype_id == $row['room_type_id']): ?>
+                    <!-- Skjema for redigering av en romtype -->
                     <tr>
                         <form action="" method="post">
                             <td><input type="text" name="type_name" value="<?php echo htmlspecialchars($row['type_name']); ?>"></td>
@@ -58,12 +61,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         </form>
                     </tr>
                 <?php else: ?>
+                    <!-- Viser romtypeinformasjon når den ikke redigeres -->
                     <tr>
                         <td><?php echo htmlspecialchars($row['type_name']); ?></td>
                         <td><?php echo htmlspecialchars($row['description']); ?></td>
                         <td><?php echo htmlspecialchars($row['max_adults']); ?></td>
                         <td><?php echo htmlspecialchars($row['max_children']); ?></td>
                         <td>
+                            <!-- Skjema for å aktivere redigering -->
                             <form action="" method="post">
                                 <input type="hidden" name="edit_roomtype_id" value="<?php echo htmlspecialchars($row['room_type_id']); ?>">
                                 <button type="submit">Edit</button>
@@ -73,10 +78,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 <?php endif;
             endwhile;
         else: ?>
+            <!-- Vises hvis det ikke finnes noen romtyper -->
             <tr>
                 <td colspan="5">No room types found.</td>
             </tr>
         <?php endif; ?>
     </tbody>
 </table>
-

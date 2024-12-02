@@ -20,7 +20,7 @@
         </div>
 
         <div class="footer-section">
-            <p>&copy; <?php echo date("Y"); ?> Ditt Motell. Alle rettigheter reservert.</p>
+            <p>&copy; <?php echo date("Y"); ?> MVP (minimum viable product) Motell. Alle rettigheter reservert.</p>
         </div>
     </div>
 </footer>

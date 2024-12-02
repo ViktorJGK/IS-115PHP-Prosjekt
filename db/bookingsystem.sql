@@ -67,11 +67,31 @@ CREATE TABLE `rooms` (
 --
 
 INSERT INTO `rooms` (`room_id`, `room_number`, `room_type_id`, `is_available`, `unavailable_from`, `unavailable_to`, `description`) VALUES
-(1, '101', 1, 1, NULL, NULL, NULL),
-(2, '102', 2, 0, NULL, NULL, NULL),
-(3, '103', 3, 1, NULL, NULL, NULL),
+(1, '101', 1, 0, NULL, NULL, NULL),
+(2, '102', 2, 1, NULL, NULL, NULL),
+(3, '103', 2, 2, NULL, NULL, NULL),
 (4, '104', 2, 1, NULL, NULL, NULL),
-(5, '105', 1, 1, NULL, NULL, NULL);
+(5, '105', 1, 0, NULL, NULL, NULL),
+(6, '106', 2, 2, NULL, NULL, NULL),
+(7, '107', 1, 0, NULL, NULL, NULL), 
+(8, '108', 2, 1, NULL, NULL, NULL),
+(9, '109', 2, 2, NULL, NULL, NULL),
+(10, '110', 1, 0, NULL, NULL, NULL),
+(11, '111', 2, 1, NULL, NULL, NULL),
+(12, '112', 2, 1, NULL, NULL, NULL),
+(13, '113', 1, 0, NULL, NULL, NULL),
+(14, '114', 2, 1, NULL, NULL, NULL),
+(15, '115', 2, 2, NULL, NULL, NULL),
+(16, '116', 1, 0, NULL, NULL, NULL),
+(17, '117', 2, 1, NULL, NULL, NULL),
+(18, '118', 2, 2, NULL, NULL, NULL),
+(19, '119', 1, 0, NULL, NULL, NULL),
+(20, '120', 2, 1, NULL, NULL, NULL),
+(21, '121', 2, 2, NULL, NULL, NULL),
+(22, '122', 1, 0, NULL, NULL, NULL),
+(23, '123', 2, 1, NULL, NULL, NULL),
+(24, '124', 2, 2, NULL, NULL, NULL),
+(25, '125', 1, 0, NULL, NULL, NULL);
 
 -- --------------------------------------------------------
 

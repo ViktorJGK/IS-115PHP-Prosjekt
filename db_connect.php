@@ -2,7 +2,7 @@
 $servername = "localhost";
 $username = "root"; // Default username for XAMPP
 $password = ""; // Default password for XAMPP
-$dbname = "bookingsystem"; // Replace with your database name
+$dbname = "bookingsystem"; // database name
 
 // Lager tilkobling
 $conn = new mysqli($servername, $username, $password, $dbname);

@@ -3,7 +3,9 @@ include '../db_connect.php'; // Include database connection
 include '../Components/header.php'; // Include the header
 include '../Components/functions/user_functions.php'; // Include User, Admin, and Guest classes
 
+
 $userProfile = null;
+
 
 if (isset($_SESSION['user_id'])) { // Sjekker innlogging
     $user_id = $_SESSION['user_id'];
