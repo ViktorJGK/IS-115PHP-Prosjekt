@@ -14,9 +14,9 @@ if (isset($_POST['room_id'], $_POST['check_in'], $_POST['check_out'], $_POST['ad
     $check_out = $_POST['check_out'];
     $adults = intval($_POST['adults']);
     $children = intval($_POST['children']);
-    $user_id = $_SESSION['user_id']; // Assumes user_id is stored in the session
+    $user_id = $_SESSION['user_id'];
 
-    // Ensure valid date range
+    // Sjekker gyldig dato
     if (strtotime($check_in) >= strtotime($check_out)) {
         die("Ugyldig dato: Innsjekking må være før utsjekking.");
     }
@@ -24,14 +24,14 @@ if (isset($_POST['room_id'], $_POST['check_in'], $_POST['check_out'], $_POST['ad
     try {
         $conn->begin_transaction();
 
-        // Insert booking into the database
+        // Insert booking inn i databasen
         $sql = "INSERT INTO bookings (user_id, room_id, check_in, check_out, adults, children, created_at)
                 VALUES (?, ?, ?, ?, ?, ?, NOW())";
         $stmt = $conn->prepare($sql);
         $stmt->bind_param("iissii", $user_id, $room_id, $check_in, $check_out, $adults, $children);
         $stmt->execute();
 
-        // Update room availability
+        // oppdaterer room availability
         $sql_update = "UPDATE rooms SET is_available = 0 WHERE room_id = ?";
         $stmt_update = $conn->prepare($sql_update);
         $stmt_update->bind_param("i", $room_id);
@@ -39,7 +39,7 @@ if (isset($_POST['room_id'], $_POST['check_in'], $_POST['check_out'], $_POST['ad
 
         $conn->commit();
 
-        // Redirect to confirmation
+        // Hvis godkjent sender til siden confirmation.php, med melding
         header("Location: confirmation.php?room_id=$room_id&status=success");
         exit;
     } catch (Exception $e) {

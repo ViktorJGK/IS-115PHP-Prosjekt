@@ -1,5 +1,5 @@
 <?php
-include 'db_connect.php'; // Sørg for at dette kobler til databasen
+include 'db_connect.php';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $room_id = $_POST['room_id'];

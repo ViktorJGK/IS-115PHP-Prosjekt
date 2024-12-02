@@ -36,13 +36,13 @@ include '../db_connect.php';
             }
         }
 
-        // Initialize the $userProfile variable as null
+        // Setter $userProfile variabelen som null
         $userProfile = null;
-        if (isset($_SESSION['user_id'])) { // Check if the user is logged in
-            $userProfile = getUserProfile($_SESSION['user_id']); // Fetch the user profile using user ID from the session
+        if (isset($_SESSION['user_id'])) { // Sjekker om bruker er innlogget
+            $userProfile = getUserProfile($_SESSION['user_id']); // Henter bruker profilen ved bruk av user ID
         }
 
-        // Only display the HTML form if the user is logged in (i.e., $userProfile is not null)
+        // Viser kun vis innlogget
         if ($userProfile) {
             echo '
         <h2>Søk etter tilgjengelige rom</h2>
@@ -68,8 +68,6 @@ include '../db_connect.php';
         ?>
 
 
-
-
         <br><br>
     </div>
     <br>
@@ -78,11 +76,12 @@ include '../db_connect.php';
         <h4>Disse er romtypene vi har</h4>
         <?php
 
+        //Viser de forskjellige rom typene som blir tilbedt
         $sql = "SELECT type_name, description, max_adults, max_children FROM room_types";
         $result = $conn->query($sql);
 
         if ($result->num_rows > 0) {
-            // Output data i en HTML-tabell
+            // Viser data i HTML tabell
             echo "<table border='1'><tr><th>Romtype</th><th>Beskrivelse</th><th>Maks Voksne</th><th>Maks Barn</th></tr>";
             while ($row = $result->fetch_assoc()) {
                 echo "<tr><td>" . $row["type_name"] . "</td><td>" . $row["description"] . "</td><td>" . $row["max_adults"] . "</td><td>" . $row["max_children"] . "</td></tr>";

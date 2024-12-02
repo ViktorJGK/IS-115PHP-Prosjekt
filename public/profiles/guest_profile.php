@@ -1,5 +1,5 @@
 <?php
-// Sikrer at bruker er admin
+// ekstra sikkerhet mot uautorisert tilgang
 if (!$userProfile instanceof User) {
     header("Location: ../../logout.php");
     exit;

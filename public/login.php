@@ -1,5 +1,5 @@
 <?php
-include '../db_connect.php'; // Include your database connection file
+include '../db_connect.php';
 include '../Components/header.php';
 
 if (session_status() == PHP_SESSION_NONE) {
@@ -14,6 +14,7 @@ if (isset($_GET['logout_message'])) {
     $logout_message = $_GET['logout_message'];
 }
 
+// kan vel inkludre denne i user_functions.php eller lignenede siden lang funksjon
 function loginUser($username, $password)
 {
     global $conn, $error;

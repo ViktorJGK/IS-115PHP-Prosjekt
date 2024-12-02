@@ -4,12 +4,12 @@ $username = "root"; // Default username for XAMPP
 $password = ""; // Default password for XAMPP
 $dbname = "bookingsystem"; // Replace with your database name
 
-// Create connection
+// Lager tilkobling
 $conn = new mysqli($servername, $username, $password, $dbname);
 
-// Check connection
+// Sjekker tilkobling
 if ($conn->connect_error) {
-    die("Connection failed: " . $conn->connect_error . "Database: " .$dbname);
+    die("Tilkobling feilet: " . $conn->connect_error . "Database: " .$dbname);
 } else {
     
 }

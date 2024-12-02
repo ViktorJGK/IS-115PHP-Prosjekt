@@ -5,7 +5,7 @@ error_reporting(E_ALL);
 
 include '../db_connect.php';
 if (!$conn) {
-    die("Database connection failed: " . $conn->connect_error);
+    die("Database tilkobling Feilet: " . $conn->connect_error);
 }
 
 include '../Components/header.php';

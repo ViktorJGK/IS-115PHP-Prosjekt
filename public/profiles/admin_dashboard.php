@@ -1,17 +1,16 @@
 <?php
 ob_start(); // Start output buffering
 
-// include "../Admin/.php";
-
+// ekstra sikkerhet mot uautorisert tilgang
 if (!isset($userProfile) || !$userProfile instanceof Admin) {
     header("Location: ../../logout.php");
     exit;
 }
 
-// Get all users from the database using the Admin class method
+// henter alle brukere fra databsen ved bruk av admin klassen
 $allUsers = $userProfile->getAllUsers();
 
-// Handle form submission for saving or canceling user edits
+// Hånterer form imput for lagring eller kanselering av bruker sin redigering
 $edit_user_id = isset($_POST['edit_user_id']) ? $_POST['edit_user_id'] : null;
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (isset($_POST['cancel'])) {
@@ -29,6 +28,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 }
 
+// kan vel inkludre denne i user_functions.php
 function getAllBookings($limit, $offset)
 {
     global $conn;
@@ -53,6 +53,7 @@ function getAllBookings($limit, $offset)
     return $result && $result->num_rows > 0 ? $result->fetch_all(MYSQLI_ASSOC) : [];
 }
 
+// kan vel inkludre denne i user_functions.php
 function getRoomTypes()
 {
     global $conn;
@@ -60,12 +61,14 @@ function getRoomTypes()
     return $result ? $result->fetch_all(MYSQLI_ASSOC) : [];
 }
 
-function getAllRooms() {
+// kan vel inkludre denne i user_functions.php
+function getAllRooms()
+{
     global $conn;
     $sql = "SELECT room_id, room_number, type_name, is_available, unavailable_from, unavailable_to 
     FROM rooms 
     JOIN room_types ON rooms.room_type_id = room_types.room_type_id";
-$result = $conn->query($sql);
+    $result = $conn->query($sql);
     return $result ? $result->fetch_all(MYSQLI_ASSOC) : [];
 }
 
@@ -84,7 +87,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $is_available = (int) $_POST['is_available'];
         $unavailable_from = $_POST['unavailable_from'] ?: null;
         $unavailable_to = $_POST['unavailable_to'] ?: null;
-    
+
         $stmt = $conn->prepare("UPDATE rooms 
                                 SET is_available = ?, unavailable_from = ?, unavailable_to = ? 
                                 WHERE room_id = ?");
@@ -92,12 +95,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         if (!$stmt->execute()) {
             die("Error updating room: " . $stmt->error);
         }
-    
+
         header('Location: ' . $_SERVER['PHP_SELF']);
         exit;
     }
-    
-    
+
+
     if (isset($_POST['save_booking'], $_POST['booking_id'], $_POST['check_in'], $_POST['check_out'], $_POST['room_type'])) {
         $booking_id = (int) $_POST['booking_id'];
         $check_in = $_POST['check_in'];
@@ -113,7 +116,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         ");
         $stmt->bind_param("sssi", $check_in, $check_out, $room_type, $booking_id);
         if (!$stmt->execute()) {
-            die("Error updating booking: " . $stmt->error);
+            die("Feil under oppdatering av booking: " . $stmt->error);
         }
 
         header('Location: ' . $_SERVER['PHP_SELF']);
@@ -123,9 +126,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (isset($_POST['delete_booking_id'])) {
         $booking_id = (int) $_POST['delete_booking_id'];
 
-        // Begin a transaction
         $conn->begin_transaction();
-
         try {
             // Get the room ID associated with the booking
             $stmt = $conn->prepare("SELECT room_id FROM bookings WHERE booking_id = ?");
@@ -136,33 +137,33 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $result = $stmt->get_result();
             $room_id = $result->fetch_assoc()['room_id'];
 
-            // Delete the booking
+            // Sletter booking
             $stmt = $conn->prepare("DELETE FROM bookings WHERE booking_id = ?");
             $stmt->bind_param("i", $booking_id);
             if (!$stmt->execute()) {
                 throw new Exception("Error deleting booking: " . $stmt->error);
             }
 
-            // Update the room's availability
+            // Oppdaterer rommets tilgjengelighet
             $stmt = $conn->prepare("UPDATE rooms SET is_available = 1 WHERE room_id = ?");
             $stmt->bind_param("i", $room_id);
             if (!$stmt->execute()) {
                 throw new Exception("Error updating room availability: " . $stmt->error);
             }
 
-            // Commit the transaction
+            // commiter
             $conn->commit();
             header('Location: ' . $_SERVER['PHP_SELF']);
             exit;
         } catch (Exception $e) {
-            // Rollback the transaction on error
+            // Rollback hvis feil
             $conn->rollback();
             die("Error processing deletion: " . $e->getMessage());
         }
     }
 }
 
-ob_end_flush(); // Send all output
+ob_end_flush(); // Sender outpuyt
 ?>
 
 <html lang="en">
@@ -301,54 +302,54 @@ ob_end_flush(); // Send all output
                 </tbody>
             </table>
         </div>
-        
-            </tr>
-    </tbody>
-</table>
 
-<h3>All Rooms</h3>
-<table>
-    <thead>
-        <tr>
-            <th>Room ID</th>
-            <th>Room Number</th>
-            <th>Type</th>
-            <th>Available</th>
-            <th>Unavailable From</th>
-            <th>Unavailable To</th>
-            <th>Actions</th>
         </tr>
-    </thead>
-    <tbody>
-        <?php
-        $allRooms = getAllRooms();
-        foreach ($allRooms as $room): ?>
-            <tr>
-                <td><?php echo htmlspecialchars($room['room_id']); ?></td>
-                <td><?php echo htmlspecialchars($room['room_number']); ?></td>
-                <td><?php echo htmlspecialchars($room['type_name']); ?></td>
-                <td><?php echo $room['is_available'] ? 'Yes' : 'No'; ?></td>
-                <td><?php echo $room['unavailable_from'] ?: 'N/A'; ?></td>
-                <td><?php echo $room['unavailable_to'] ?: 'N/A'; ?></td>
-                <td>
-                    <form action="" method="post">
-                        <input type="hidden" name="room_id" value="<?php echo htmlspecialchars($room['room_id']); ?>">
-                        <label for="is_available">Available:</label>
-                        <select name="is_available">
-                            <option value="1" <?php echo $room['is_available'] == 1 ? 'selected' : ''; ?>>Yes</option>
-                            <option value="0" <?php echo $room['is_available'] == 0 ? 'selected' : ''; ?>>No</option>
-                        </select><br>
-                        <label for="unavailable_from">Unavailable From:</label>
-                        <input type="date" name="unavailable_from" value="<?php echo htmlspecialchars($room['unavailable_from']); ?>"><br>
-                        <label for="unavailable_to">Unavailable To:</label>
-                        <input type="date" name="unavailable_to" value="<?php echo htmlspecialchars($room['unavailable_to']); ?>"><br>
-                        <button type="submit" name="update_room">Update</button>
-                    </form>
-                </td>
-            </tr>
-        <?php endforeach; ?>
-    </tbody>
-</table>
+        </tbody>
+        </table>
+
+        <h3>All Rooms</h3>
+        <table>
+            <thead>
+                <tr>
+                    <th>Room ID</th>
+                    <th>Room Number</th>
+                    <th>Type</th>
+                    <th>Available</th>
+                    <th>Unavailable From</th>
+                    <th>Unavailable To</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                <?php
+                $allRooms = getAllRooms();
+                foreach ($allRooms as $room): ?>
+                    <tr>
+                        <td><?php echo htmlspecialchars($room['room_id']); ?></td>
+                        <td><?php echo htmlspecialchars($room['room_number']); ?></td>
+                        <td><?php echo htmlspecialchars($room['type_name']); ?></td>
+                        <td><?php echo $room['is_available'] ? 'Yes' : 'No'; ?></td>
+                        <td><?php echo $room['unavailable_from'] ?: 'N/A'; ?></td>
+                        <td><?php echo $room['unavailable_to'] ?: 'N/A'; ?></td>
+                        <td>
+                            <form action="" method="post">
+                                <input type="hidden" name="room_id" value="<?php echo htmlspecialchars($room['room_id']); ?>">
+                                <label for="is_available">Available:</label>
+                                <select name="is_available">
+                                    <option value="1" <?php echo $room['is_available'] == 1 ? 'selected' : ''; ?>>Yes</option>
+                                    <option value="0" <?php echo $room['is_available'] == 0 ? 'selected' : ''; ?>>No</option>
+                                </select><br>
+                                <label for="unavailable_from">Unavailable From:</label>
+                                <input type="date" name="unavailable_from" value="<?php echo htmlspecialchars($room['unavailable_from']); ?>"><br>
+                                <label for="unavailable_to">Unavailable To:</label>
+                                <input type="date" name="unavailable_to" value="<?php echo htmlspecialchars($room['unavailable_to']); ?>"><br>
+                                <button type="submit" name="update_room">Update</button>
+                            </form>
+                        </td>
+                    </tr>
+                <?php endforeach; ?>
+            </tbody>
+        </table>
 
 
     </div>
