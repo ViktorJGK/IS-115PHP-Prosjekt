@@ -1,15 +1,14 @@
 <?php
 ob_start(); // Start output buffering
 
-include_once '../Components/functions/user_functions.php';
+// include "../Admin/.php";
 
-// Start session and ensure user authentication
 if (!isset($userProfile) || !$userProfile instanceof Admin) {
     header("Location: ../../logout.php");
     exit;
 }
 
-// Fetch all users using Admin's method
+// Get all users from the database using the Admin class method
 $allUsers = $userProfile->getAllUsers();
 
 // Handle form submission for saving or canceling user edits
@@ -30,10 +29,51 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 }
 
-// Set limits for bookings and use the Admin's method to get bookings
+function getAllBookings($limit, $offset)
+{
+    global $conn;
+    $sql = "SELECT bookings.booking_id, bookings.check_in, bookings.check_out, 
+                   users.username, room_types.type_name AS room_type 
+            FROM bookings 
+            JOIN rooms ON bookings.room_id = rooms.room_id 
+            JOIN room_types ON rooms.room_type_id = room_types.room_type_id 
+            JOIN users ON bookings.user_id = users.user_id
+            LIMIT ? OFFSET ?";
+    $stmt = $conn->prepare($sql);
+    if (!$stmt) {
+        die("SQL error: " . $conn->error);
+    }
+
+    $stmt->bind_param("ii", $limit, $offset);
+    if (!$stmt->execute()) {
+        die("Execution error: " . $stmt->error);
+    }
+    $result = $stmt->get_result();
+
+    return $result && $result->num_rows > 0 ? $result->fetch_all(MYSQLI_ASSOC) : [];
+}
+
+function getRoomTypes()
+{
+    global $conn;
+    $result = $conn->query("SELECT type_name FROM room_types");
+    return $result ? $result->fetch_all(MYSQLI_ASSOC) : [];
+}
+
+function getAllRooms() {
+    global $conn;
+    $sql = "SELECT room_id, room_number, type_name, is_available, unavailable_from, unavailable_to 
+    FROM rooms 
+    JOIN room_types ON rooms.room_type_id = room_types.room_type_id";
+$result = $conn->query($sql);
+    return $result ? $result->fetch_all(MYSQLI_ASSOC) : [];
+}
+
+
+
 $limit = 10;
 $offset = 0;
-$allBookings = $userProfile->getAllBookings($limit, $offset);
+$allBookings = getAllBookings($limit, $offset);
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (isset($_POST['cancel_edit'])) {
@@ -45,7 +85,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $is_available = (int) $_POST['is_available'];
         $unavailable_from = $_POST['unavailable_from'] ?: null;
         $unavailable_to = $_POST['unavailable_to'] ?: null;
-
+    
         $stmt = $conn->prepare("UPDATE rooms 
                                 SET is_available = ?, unavailable_from = ?, unavailable_to = ? 
                                 WHERE room_id = ?");
@@ -53,11 +93,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         if (!$stmt->execute()) {
             die("Error updating room: " . $stmt->error);
         }
-
+    
         header('Location: ' . $_SERVER['PHP_SELF']);
         exit;
     }
-
+    
+    
     if (isset($_POST['save_booking'], $_POST['booking_id'], $_POST['check_in'], $_POST['check_out'], $_POST['room_type'])) {
         $booking_id = (int) $_POST['booking_id'];
         $check_in = $_POST['check_in'];
@@ -122,9 +163,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 }
 
+
 ob_end_flush(); // Send all output
 ?>
-
 
 <html lang="en">
 
@@ -217,7 +258,7 @@ ob_end_flush(); // Send all output
                                         <td>
                                             <select name="room_type">
                                                 <?php
-                                                $roomTypes->getRoomTypes();
+                                                $roomTypes = getRoomTypes();
                                                 foreach ($roomTypes as $roomType) {
                                                     $selected = $booking['room_type'] === $roomType['type_name'] ? 'selected' : '';
                                                     echo "<option value='{$roomType['type_name']}' $selected>{$roomType['type_name']}</option>";
@@ -262,54 +303,103 @@ ob_end_flush(); // Send all output
                 </tbody>
             </table>
         </div>
+        
+            </tr>
+    </tbody>
+</table>
 
-        </tr>
-        </tbody>
-        </table>
+<h3>Alle rom</h3>
+<table>
+    <thead>
+        <?php
 
-        <h3>All Rooms</h3>
+        // Hent alle rom og vis dem i tabellen
+        $allRooms = getAllRooms();
+        
+        // Håndtere forminnsending for oppdatering av rom
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            if (isset($_POST['update_room'])) {
+                $room_id = (int) $_POST['room_id'];
+                $is_available = (int) $_POST['is_available'];
+                $unavailable_from = $_POST['unavailable_from'] ?: null;
+                $unavailable_to = $_POST['unavailable_to'] ?: null;
+                $room_type_id = (int) $_POST['room_type_id'];
+                $room_type_name = $_POST['room_type_name'];
+                $room_description = $_POST['room_description'];
+        
+                // Start transaksjon
+                $conn->begin_transaction();
+        
+                try {
+                    // Oppdater tilgjengelighet og datoer for rommet
+                    $stmt1 = $conn->prepare("UPDATE rooms 
+                                             SET is_available = ?, unavailable_from = ?, unavailable_to = ? 
+                                             WHERE room_id = ?");
+                    $stmt1->bind_param("issi", $is_available, $unavailable_from, $unavailable_to, $room_id);
+                    if (!$stmt1->execute()) {
+                        throw new Exception("Error updating room availability: " . $stmt1->error);
+                    }
+        
+                    // Oppdater romtype (navn og beskrivelse)
+                    $stmt2 = $conn->prepare("UPDATE room_types 
+                                             SET type_name = ?, description = ? 
+                                             WHERE room_type_id = ?");
+                    $stmt2->bind_param("ssi", $room_type_name, $room_description, $room_type_id);
+                    if (!$stmt2->execute()) {
+                        throw new Exception("Error updating room type: " . $stmt2->error);
+                    }
+        
+                    // Commit transaksjonen
+                    $conn->commit();
+                    header('Location: ' . $_SERVER['PHP_SELF']);
+                    exit;
+        
+                } catch (Exception $e) {
+                    // Rollback hvis noe går galt
+                    $conn->rollback();
+                    die("Error: " . $e->getMessage());
+                }
+            }
+        }
+        ?>
+        
+        <!-- HTML for å vise rom i en tabell og oppdatere -->
         <table>
             <thead>
                 <tr>
-                    <th>Room ID</th>
-                    <th>Room Number</th>
-                    <th>Type</th>
-                    <th>Available</th>
-                    <th>Unavailable From</th>
-                    <th>Unavailable To</th>
-                    <th>Actions</th>
+                    <th>Romnummer</th>
+                    <th>Romtype</th>
+                    <th>Beskrivelse</th>
+                    <th>Tilgjengelighet</th>
+                    <th>Endre</th>
                 </tr>
             </thead>
             <tbody>
-                <?php
-                $allRooms = $userProfile->getAllRooms();
-                foreach ($allRooms as $room): ?>
+                <?php foreach ($allRooms as $room): ?>
                     <tr>
-                        <td><?php echo htmlspecialchars($room['room_id']); ?></td>
                         <td><?php echo htmlspecialchars($room['room_number']); ?></td>
                         <td><?php echo htmlspecialchars($room['type_name']); ?></td>
-                        <td><?php echo $room['is_available'] ? 'Yes' : 'No'; ?></td>
-                        <td><?php echo $room['unavailable_from'] ?: 'N/A'; ?></td>
-                        <td><?php echo $room['unavailable_to'] ?: 'N/A'; ?></td>
+                        <td><?php echo htmlspecialchars($room['description']); ?></td>
                         <td>
-                            <form action="" method="post">
-                                <input type="hidden" name="room_id" value="<?php echo htmlspecialchars($room['room_id']); ?>">
-                                <label for="is_available">Available:</label>
+                            <form method="post">
+                                <input type="hidden" name="room_id" value="<?php echo $room['room_id']; ?>">
                                 <select name="is_available">
-                                    <option value="1" <?php echo $room['is_available'] == 1 ? 'selected' : ''; ?>>Yes</option>
-                                    <option value="0" <?php echo $room['is_available'] == 0 ? 'selected' : ''; ?>>No</option>
-                                </select><br>
-                                <label for="unavailable_from">Unavailable From:</label>
-                                <input type="date" name="unavailable_from" value="<?php echo htmlspecialchars($room['unavailable_from']); ?>"><br>
-                                <label for="unavailable_to">Unavailable To:</label>
-                                <input type="date" name="unavailable_to" value="<?php echo htmlspecialchars($room['unavailable_to']); ?>"><br>
-                                <button type="submit" name="update_room">Update</button>
+                                    <option value="1" <?php echo $room['is_available'] == 1 ? 'selected' : ''; ?>>Tilgjengelig</option>
+                                    <option value="0" <?php echo $room['is_available'] == 0 ? 'selected' : ''; ?>>Utilgjengelig</option>
+                                </select>
+                                <input type="date" name="unavailable_from" value="<?php echo $room['unavailable_from']; ?>">
+                                <input type="date" name="unavailable_to" value="<?php echo $room['unavailable_to']; ?>">
+                                <input type="hidden" name="room_type_id" value="<?php echo $room['room_type_id']; ?>">
+                                <input type="text" name="room_type_name" value="<?php echo htmlspecialchars($room['type_name']); ?>" placeholder="Romtype navn">
+                                <textarea name="room_description" placeholder="Beskrivelse"><?php echo htmlspecialchars($room['description']); ?></textarea>
+                                <button type="submit" name="update_room">Oppdater Rom</button>
                             </form>
                         </td>
                     </tr>
                 <?php endforeach; ?>
             </tbody>
         </table>
+        
 
 
     </div>
