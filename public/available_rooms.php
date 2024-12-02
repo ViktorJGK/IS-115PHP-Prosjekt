@@ -19,12 +19,18 @@ if (isset($_POST['check_in'], $_POST['check_out'], $_POST['adults'], $_POST['chi
         die("<p>Ugyldig dato: Innsjekking må være før utsjekking.</p>");
     }
 
-    // Søk etter ledige rom basert på bookings-tabellen
+    // Søk etter ledige rom basert på bookings-tabellen og tilgjengelighet
     $sql_available = "
         SELECT r.room_id, r.room_number, rt.type_name, rt.max_adults, rt.max_children, rt.price 
         FROM rooms r
         JOIN room_types rt ON r.room_type_id = rt.room_type_id
-        WHERE rt.max_adults >= ? 
+        WHERE r.is_available = 1
+        AND (
+            (r.unavailable_from IS NULL AND r.unavailable_to IS NULL)
+            OR ('$check_in' NOT BETWEEN r.unavailable_from AND r.unavailable_to)
+            OR ('$check_out' NOT BETWEEN r.unavailable_from AND r.unavailable_to)
+        )
+        AND rt.max_adults >= ? 
         AND rt.max_children >= ?
         AND r.room_id NOT IN (
             SELECT room_id FROM bookings 
