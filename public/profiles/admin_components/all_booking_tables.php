@@ -1,9 +1,12 @@
 <?php
+ob_start(); // Start output buffering
+
+include_once '../Components/functions/user_functions.php'; // Inkluderer nødvendige funksjoner som kan være relatert til brukerhåndtering og autentisering
+
 // Sett grense og offset for paginering av bookingene
-// Henter alle bookingene ved å bruke metoden getAllBookings fra $userProfile-objektet
 $limit = 10; // Maksimalt antall bookingoppføringer per side
 $offset = 0; // Startpunkt for oppføringer
-$allBookings = $userProfile->getAllBookings($limit, $offset);
+$allBookings = $userProfile->getAllBookings($limit, $offset); // Henter alle bookingene
 
 // Sjekk om skjemaet er sendt via en POST-forespørsel
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -21,9 +24,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $unavailable_to = $_POST['unavailable_to'] ?: null; // Sluttdato for utilgjengelighet
 
         // SQL-spørring for å oppdatere rommets tilgjengelighet
-        $stmt = $conn->prepare("UPDATE rooms 
-                                SET is_available = ?, unavailable_from = ?, unavailable_to = ? 
-                                WHERE room_id = ?");
+        $stmt = $conn->prepare("UPDATE rooms SET is_available = ?, unavailable_from = ?, unavailable_to = ? WHERE room_id = ?");
         $stmt->bind_param("issi", $is_available, $unavailable_from, $unavailable_to, $room_id);
         if (!$stmt->execute()) {
             die("Feil ved oppdatering av rom: " . $stmt->error); // Avbryt hvis en feil oppstår
@@ -76,6 +77,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
     }
 }
+
+ob_end_flush(); // Send all output
 ?>
 
 <h3>Alle Bookinger</h3>

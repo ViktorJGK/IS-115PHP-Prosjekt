@@ -9,16 +9,13 @@ if (!isset($userProfile) || !$userProfile instanceof Admin) {
     exit; // Stopp videre utførelse av skriptet etter redirect.
 }
 
-ob_end_flush(); // Sender alt innhold som er samlet i output bufferet til nettleseren.
 ?>
 
 <html lang="en"> <!-- Setter språket for HTML-dokumentet til engelsk -->
-
 <head>
     <link rel="stylesheet" href="../css/admin.css"> <!-- Kobler til administrasjonsstilarket for å style dashboardet -->
     <title>Admin Dashboard</title> <!-- Tittel på nettsiden som vises i nettleserfanen -->
 </head>
-
 <body>
     <div>
         <div>
@@ -47,13 +44,9 @@ ob_end_flush(); // Sender alt innhold som er samlet i output bufferet til nettle
             echo "<br>";
             ?>
 
-
         </div>
-
-        </tr>
-        </tbody>
-    
     </div>
 </body>
-
 </html>
+
+<?php ob_end_flush(); // Sender alt innhold som er samlet i output bufferet til nettleseren. ?>
